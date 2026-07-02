@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Energetic race-fuel palette; same token conventions as 50fivestarhotels */
+  --color-bg: #F7F4EB;
+  --color-bg-soft: #F0EBDA;
+  --color-bg-card: #FFFFFF;
+  --color-text: #23211B;
+  --color-text-muted: #5B5548;
+  --color-accent: #D95A2B;
+  --color-accent-deep: #A8431F;
+  --color-green: #4C7A3F;
+  --color-green-soft: #E5EDDD;
+  --color-amber: #C08A24;
+  --color-amber-soft: #F6E9CB;
+  --color-red: #BC3F2C;
+  --color-red-soft: #F6DCD5;
+  --color-border: #E3DCC6;
+  --color-paper-warm: #FBF8EF;
+  --color-ink-soft: #5B5548;
+
+  --font-sans: Archivo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Bodoni Moda", Georgia, "Times New Roman", serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --shadow-card: 0 3px 18px rgba(35, 33, 27, 0.07);
+  --shadow-print: 5px 5px 0 rgba(217, 90, 43, 0.14);
+  --shadow-print-green: 5px 5px 0 rgba(76, 122, 63, 0.16);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  letter-spacing: 0;
+  font-optical-sizing: auto;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Shared card / button / label helpers (homepage + calculator page) */
+.fuel-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-print);
+}
+
+.fuel-card-green {
+  box-shadow: var(--shadow-print-green);
+}
+
+.fuel-btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  padding: 0.78rem 1.1rem;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.fuel-btn-accent {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--color-accent-deep);
+}
+
+.fuel-btn:hover { transform: translateY(-1px); }
+.fuel-btn:active { transform: translateY(2px); box-shadow: none; }
+
+.fuel-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
