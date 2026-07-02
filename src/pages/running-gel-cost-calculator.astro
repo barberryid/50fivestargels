@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RaceFuelCalculator from '../components/calculator/RaceFuelCalculator';
+import { webApplicationJsonLd, webPageJsonLd } from '../lib/seo';
+
+const title = 'Race Fuel Cost Calculator — DIY race mix vs gels, priced per gram of carb';
+const description =
+  'Work out a DIY bottle mix or soft-flask syrup for marathon, half marathon, HYROX or long training — with cost per gram of carbohydrate, a training-block savings estimate and an honest gut-load warning.';
+
+const trustBlocks = [
+  {
+    title: 'Why this formula?',
+    body: 'Maltodextrin is a glucose polymer: it carries a lot of carbohydrate with less sweetness and fewer osmotically-active particles than straight sugar, which is why a malto-heavy mix can deliver more carb at a lower estimated gut cost. Fructose is absorbed through a separate intestinal transporter, so a glucose+fructose mix raises how much you can take in per hour. Sodium replaces some of what you sweat out, and the water is what actually carries it all in.',
+  },
+  {
+    title: 'What could go wrong?',
+    body: 'GI upset from too much too soon; a mix that is too concentrated for your gut on the day; more sodium than you need; caffeine sensitivity if you add it on top; or not drinking enough plain water alongside a syrup. Heat and race-day nerves make all of these more likely — which is why everything here starts lower than the maximums.',
+  },
+  {
+    title: 'How to test it',
+    body: 'Start below your target carbs per hour. Try the mix on easy long sessions first, log how your stomach felt, and only then build towards race intake. Adjust for hot days. Never race on a recipe you have not trained with.',
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/running-gel-cost-calculator/"
+  jsonLd={[
+    webApplicationJsonLd(),
+    webPageJsonLd({ title, description, path: '/running-gel-cost-calculator/' }),
+  ]}
+>
+  <main style="max-width:1080px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">Free tool · no sign-up</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.05;margin:10px 0 0;">Race Fuel Cost Calculator</h1>
+    <p style="max-width:64ch;color:var(--color-text-muted);line-height:1.65;margin:16px 0 0;">
+      Should you buy gels, make your own mix, or use both? Pick a race preset or set your own session, and get a
+      gram-accurate recipe, its cost per gram of carbohydrate, and what a full training block would save you.
+    </p>
+
+    <RaceFuelCalculator client:load />
+
+    <section style="margin-top:40px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+        {
+          trustBlocks.map((block) => (
+            <div class="fuel-card" style="padding:22px;">
+              <h2 style="font-family:var(--font-sans);font-size:1.02rem;font-weight:800;margin:0;">{block.title}</h2>
+              <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:10px 0 0;">
+                {block.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="fuel-card" style="margin-top:28px;padding:24px;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">
+        Commercial gels still have a role
+      </h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:14px;">
+        <div>
+          <h3 style="font-family:var(--font-sans);font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--color-green);margin:0;">
+            DIY is best for
+          </h3>
+          <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:8px 0 0;">
+            Regular training, long runs, cost control, bottle-based fuelling, and custom sodium or carb targets.
+          </p>
+        </div>
+        <div>
+          <h3 style="font-family:var(--font-sans);font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--color-accent);margin:0;">
+            Commercial gels are best for
+          </h3>
+          <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:8px 0 0;">
+            Race-day convenience, travel, aid-station simplicity, measured caffeine doses, and a known texture and
+            tolerance with no mixing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-top:28px;max-width:72ch;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">
+        About the gut-load estimate
+      </h2>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.95rem;margin:10px 0 0;">
+        This is an estimate, not a lab osmolality test. The calculator uses carbohydrate concentration, ingredient type
+        and sodium level to flag whether your mix is likely to behave like a normal drink, a concentrated syrup, or a
+        gel that should be chased with water. Real-world osmolality depends on things a consumer calculator cannot know
+        precisely — maltodextrin chain length, exact dissociation, and how accurately you measure and mix.
+      </p>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;margin:14px 0 0;">
+        <strong>Worth knowing before you rely on any of this:</strong> if you have diabetes or glucose-control issues,
+        kidney disease, high blood pressure or a sodium-restricted diet, caffeine sensitivity or a heart-rhythm
+        condition, a history of GI distress, or relevant allergies and intolerances, treat these numbers as a
+        conversation starter with a professional — not a plan.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
