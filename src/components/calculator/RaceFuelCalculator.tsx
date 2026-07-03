@@ -24,8 +24,15 @@ import {
   type GutLoadLevel,
   type Prices,
 } from '../../lib/fuelMath';
+import {
+  REGION_LABELS,
+  costPerGramCarb,
+  productsForRegion,
+  useCasePicks,
+  type Region,
+} from '../../data/gels';
 
-type Mode = 'bottle' | 'syrup';
+type Mode = 'bottle' | 'syrup' | 'commercial';
 
 interface CalcState {
   mode: Mode;
@@ -39,6 +46,7 @@ interface CalcState {
   flaskMl: number;
   flaskCount: number;
   carbsOverride: number | null;
+  region: Region;
   sessionsPerWeek: number;
   avgSessionMin: number;
   weeks: number;
@@ -57,6 +65,7 @@ const INITIAL: CalcState = {
   flaskMl: 150,
   flaskCount: 1,
   carbsOverride: null,
+  region: 'EU',
   sessionsPerWeek: SAVINGS_DEFAULTS.sessionsPerWeek,
   avgSessionMin: SAVINGS_DEFAULTS.avgSessionMin,
   weeks: SAVINGS_DEFAULTS.weeks,
@@ -93,7 +102,9 @@ function parseParams(search: string): Partial<CalcState> {
   const q = new URLSearchParams(search);
   const out: Partial<CalcState> = {};
   const mode = q.get('mode');
-  if (mode === 'bottle' || mode === 'syrup') out.mode = mode;
+  if (mode === 'bottle' || mode === 'syrup' || mode === 'commercial') out.mode = mode;
+  const region = q.get('region');
+  if (region === 'UK' || region === 'EU' || region === 'US') out.region = region;
   const sport = q.get('sport');
   if (sport && (sport === 'custom' || sport in SPORT_PRESETS)) out.sport = sport as SportKey;
   const duration = num(q.get('duration'));
@@ -139,9 +150,11 @@ function buildParams(s: CalcState, carbsPerHour: number): string {
     weeks: String(s.weeks),
   });
   if (s.mode === 'bottle') q.set('bottle', String(s.bottleMl));
-  else {
+  else if (s.mode === 'syrup') {
     q.set('flask', String(s.flaskMl));
     q.set('flasks', String(s.flaskCount));
+  } else {
+    q.set('region', s.region);
   }
   return q.toString();
 }
@@ -177,10 +190,12 @@ export default function RaceFuelCalculator() {
     window.history.replaceState(null, '', url);
   }, [state, ready, carbsPerHour]);
 
+  // In commercial mode the DIY reference recipe (for cost comparison) is a
+  // standard bottle mix built from the same inputs.
   const recipe = useMemo(
     () =>
       computeRecipe({
-        mode: state.mode,
+        mode: state.mode === 'commercial' ? 'bottle' : state.mode,
         durationMin: state.durationMin,
         carbsPerHour,
         ratio: state.ratio,
@@ -254,12 +269,11 @@ export default function RaceFuelCalculator() {
         <button
           type="button"
           role="tab"
-          aria-selected={false}
-          disabled
-          className="cursor-not-allowed rounded-full border border-border bg-bg-soft px-3.5 py-2 font-sans text-[13px] font-bold text-text-muted opacity-70"
-          title="Commercial gel comparison is coming in phase 2"
+          aria-selected={state.mode === 'commercial'}
+          className={chipCls(state.mode === 'commercial')}
+          onClick={() => patch({ mode: 'commercial' })}
         >
-          Commercial gel comparison — coming soon
+          Commercial gel comparison
         </button>
       </div>
 
@@ -379,6 +393,7 @@ export default function RaceFuelCalculator() {
         </div>
         {state.mode === 'bottle' ? (
           <div>
+            {/* container pickers hidden in commercial mode */}
             <label className={labelCls} htmlFor="rf-bottle">
               Bottle size
             </label>
@@ -395,7 +410,7 @@ export default function RaceFuelCalculator() {
               ))}
             </select>
           </div>
-        ) : (
+        ) : state.mode === 'syrup' ? (
           <>
             <div>
               <label className={labelCls} htmlFor="rf-flask">
@@ -429,6 +444,24 @@ export default function RaceFuelCalculator() {
               />
             </div>
           </>
+        ) : (
+          <div>
+            <label className={labelCls} htmlFor="rf-region">
+              Where do you shop?
+            </label>
+            <select
+              id="rf-region"
+              className={inputCls}
+              value={state.region}
+              onChange={(e) => patch({ region: e.target.value as Region })}
+            >
+              {(Object.keys(REGION_LABELS) as Region[]).map((r) => (
+                <option key={r} value={r}>
+                  {REGION_LABELS[r]}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 
@@ -439,7 +472,8 @@ export default function RaceFuelCalculator() {
         </div>
       )}
 
-      {/* Per-serving recipe */}
+      {/* Per-serving recipe (DIY modes) */}
+      {state.mode !== 'commercial' && (
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <div className="rounded-lg border border-border bg-paper-warm p-5">
           <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-text">
@@ -508,6 +542,100 @@ export default function RaceFuelCalculator() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Commercial gel comparison (phase 2 dataset) */}
+      {state.mode === 'commercial' && (
+        <div className="mt-6">
+          <div className="rounded-lg border border-border bg-white p-4 font-sans text-[14px]">
+            Your DIY reference mix (same targets, bottle mix): <strong>{cur}{recipe.costPerGramCarb.toFixed(4)}</strong>{' '}
+            per gram of carb <span className="text-text-muted">(≈ {money(recipe.costPerGramCarb * 60)} per 60 g)</span>.
+            Every product below shows the same metric so you can compare buy vs make directly.
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {useCasePicks(state.region).map((pick) => (
+              <div key={pick.label} className="rounded-lg border border-border bg-paper-warm px-3 py-2">
+                <span className="block font-sans text-[10.5px] font-extrabold uppercase tracking-[0.08em] text-accent">
+                  {pick.label}
+                </span>
+                <span className="block font-sans text-[13px] font-bold text-text">
+                  {pick.product.brand} {pick.product.product}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full border-collapse font-sans text-[13px]">
+              <thead>
+                <tr className="border-b-2 border-border text-left">
+                  <th className="py-2 pr-3 font-extrabold">Product</th>
+                  <th className="py-2 pr-3 font-extrabold">Carbs</th>
+                  <th className="py-2 pr-3 font-extrabold">Sodium</th>
+                  <th className="py-2 pr-3 font-extrabold">Caffeine</th>
+                  <th className="py-2 pr-3 font-extrabold">Typical price</th>
+                  <th className="py-2 pr-3 font-extrabold">Per g carb</th>
+                  <th className="py-2 pr-3 font-extrabold">Per 60 g</th>
+                  <th className="py-2 font-extrabold"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsForRegion(state.region).map((p) => (
+                  <tr key={p.id} className="border-b border-border align-top">
+                    <td className="py-2 pr-3">
+                      <strong>
+                        {p.brand} {p.product}
+                      </strong>
+                      <span className="block text-[11.5px] text-text-muted">
+                        {p.servingSize}
+                        {p.note ? ` · ${p.note}` : ''}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{p.carbsG} g</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{p.sodiumMg} mg</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">{p.caffeineMg > 0 ? `${p.caffeineMg} mg` : '—'}</td>
+                    <td className="py-2 pr-3 whitespace-nowrap">
+                      {p.currency}
+                      {p.typicalPrice.toFixed(2)}
+                    </td>
+                    <td className="py-2 pr-3 whitespace-nowrap">
+                      {p.currency}
+                      {costPerGramCarb(p).toFixed(4)}
+                    </td>
+                    <td className="py-2 pr-3 whitespace-nowrap">
+                      {p.currency}
+                      {(costPerGramCarb(p) * 60).toFixed(2)}
+                    </td>
+                    <td className="py-2 whitespace-nowrap">
+                      <button
+                        type="button"
+                        className="rounded-md border border-border bg-white px-2 py-1 text-[11.5px] font-bold text-text-muted hover:border-accent-deep hover:text-text"
+                        onClick={() =>
+                          patchPrices({ gelPrice: p.typicalPrice, gelCarbs: p.carbsG, currency: p.currency })
+                        }
+                        title="Use this product's price and carbs in the training-block savings comparison below"
+                      >
+                        Use in savings
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mb-0 mt-3 font-sans text-[12px] leading-relaxed text-text-muted">
+            Typical single-unit prices, last checked 2026-07 — multipacks are usually cheaper, and sodium/caffeine vary
+            by flavour. Ranked by cost per gram of carbohydrate within your region; picks above are by use case, never
+            "best overall". For live prices in your country, the{' '}
+            <a href="/ai-race-fuel-prompt-generator/" className="font-bold text-accent">
+              prompt generator
+            </a>{' '}
+            asks your AI to check today's shelves.
+          </p>
+        </div>
+      )}
 
       {/* Training-block savings */}
       <div className="fuel-card-green mt-6 rounded-lg border border-border p-5">
