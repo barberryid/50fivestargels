@@ -49,6 +49,9 @@ Pages project is connected. (confirmed 2026-07-02)
 - Calculator page (canonical slug `/running-gel-cost-calculator/`): `src/pages/running-gel-cost-calculator.astro`
 - Calculator React island: `src/components/calculator/RaceFuelCalculator.tsx`
 - Calculator maths (pure functions): `src/lib/fuelMath.ts`
+- Prompt generator page (canonical slug /ai-race-fuel-prompt-generator/): `src/pages/ai-race-fuel-prompt-generator.astro`
+- Prompt generator React island: `src/components/promptgen/PromptGenerator.tsx`
+- Prompt assembly (pure functions): `src/lib/promptBuilder.ts`
 - Starter assumptions & default prices: `src/data/defaults.ts`
 - Layouts: `src/layouts/BaseLayout.astro`
 - Site chrome: `src/components/Header.astro`, `src/components/Footer.astro`
