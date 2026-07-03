@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PromptGenerator from '../components/promptgen/PromptGenerator';
+import { webPageJsonLd, canonicalUrl } from '../lib/seo';
+
+const title = 'AI Race Fuel Prompt Generator — personalised fuelling prompts for any AI assistant';
+const description =
+  'Answer a short questionnaire and get a copy-paste prompt for Claude, ChatGPT or any AI — find gels in your country, compare commercial vs DIY, or build a marathon or HYROX fuelling plan.';
+
+const webAppJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'AI Race Fuel Prompt Generator',
+  url: canonicalUrl('/ai-race-fuel-prompt-generator/'),
+  applicationCategory: 'HealthApplication',
+  operatingSystem: 'Web',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  description,
+};
+
+const steps = [
+  {
+    title: 'Pick a prompt type',
+    body: 'Six jobs your AI can do: find gels near you, compare commercial vs DIY, build a marathon or HYROX plan, troubleshoot your stomach, or write your race-day checklist.',
+  },
+  {
+    title: 'Answer the questionnaire',
+    body: 'Sport, duration, bodyweight, carb target, sweat level, country, budget and preferences — the prompt personalises itself as you type.',
+  },
+  {
+    title: 'Copy it into your AI',
+    body: 'Paste into Claude, ChatGPT, Gemini or any assistant with web search. Your AI fetches current, country-aware prices — so the answers stay fresh without this site maintaining a price database.',
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/ai-race-fuel-prompt-generator/"
+  jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/ai-race-fuel-prompt-generator/' })]}
+>
+  <main style="max-width:1080px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">Free tool · no sign-up</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.05;margin:10px 0 0;">
+      AI Race Fuel Prompt Generator
+    </h1>
+    <p style="max-width:64ch;color:var(--color-text-muted);line-height:1.65;margin:16px 0 0;">
+      Gel prices and availability change constantly — a static list would be stale in a month. Instead, answer a short
+      questionnaire and get a structured prompt for your AI assistant, built to search current prices in your country
+      and rank everything by cost per gram of carbohydrate.
+    </p>
+
+    <PromptGenerator client:load />
+
+    <section style="margin-top:40px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">
+        {
+          steps.map((step, i) => (
+            <div class="fuel-card" style="padding:22px;">
+              <p class="fuel-eyebrow" style="margin:0;">Step {i + 1}</p>
+              <h2 style="font-family:var(--font-sans);font-size:1.02rem;font-weight:800;margin:8px 0 0;">
+                {step.title}
+              </h2>
+              <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:10px 0 0;">
+                {step.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section style="margin-top:28px;max-width:72ch;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">
+        What's baked into every prompt
+      </h2>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.95rem;margin:10px 0 0;">
+        Every generated prompt instructs your AI to rank by price per gram of carbohydrate, show sodium and caffeine
+        per serving, separate race-day convenience from training-cost value, include DIY alternatives, refuse caffeine
+        powder recipes, and treat every plan as a starting point to test in training. You get the personalisation; the
+        guardrails come standard.
+      </p>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;margin:14px 0 0;">
+        Want the numbers yourself instead? The
+        <a href="/running-gel-cost-calculator/" style="color:var(--color-accent);font-weight:700;"
+          >Race Fuel Cost Calculator</a
+        >
+        works out DIY recipes and training-block savings with no AI involved.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
