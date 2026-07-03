@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { webPageJsonLd } from '../lib/seo';
+import { CARB_BANDS } from '../data/defaults';
+
+const title = 'Marathon & half-marathon fuelling guide — carbs, sodium and gels that hold up';
+const description =
+  'How much carbohydrate per hour for a marathon or half, glucose:fructose ratios, sodium by sweat level, a race-morning timeline, and how to test everything in training first.';
+
+const timeline = [
+  { t: 'T-48h to T-24h', body: 'Carb loading: shift meals towards high-carb, low-fibre food (rice, pasta, bread, bananas). You are topping up glycogen, not overeating — roughly 8–10 g of carbs per kg of bodyweight per day on the final day if your gut handles it.' },
+  { t: 'T-3h', body: 'Last proper meal: high-carb, low-fibre, low-fat. Familiar food only. Porridge, toast and honey, rice — whatever you have trained with.' },
+  { t: 'T-1h', body: 'Small carb snack if you want it: banana, white bread and jam, or a sports drink. Sip fluids.' },
+  { t: 'T-30min', body: 'Optional top-up: a gel or a few sips of carb drink. If you use caffeine, this is the window — 3–6 mg/kg, tested in training, from measured doses only.' },
+  { t: 'During', body: 'Start fuelling early — from 20–30 minutes in, not when you feel empty. Hit your g/h target in small regular doses. Fluids 400–700 ml/h to thirst and conditions; sodium 400–900 mg/h if you sweat heavily.' },
+];
+
+const mistakes = [
+  'Fuelling too late — glycogen runs down before the first gel goes in. Start in the first half hour.',
+  'A concentration your gut has never met — a strong mix or back-to-back gels without water is how race-day nausea happens.',
+  'New products on race day — the aid-station brand is not automatically your brand. Check what the course stocks and train with it, or carry your own.',
+  'Copying a faster runner’s numbers — 90 g/h is a gut-trained ceiling, not a starting point. Work up from the defaults.',
+  'Ignoring heat — hot days shift the balance towards more fluid and sodium and often less carbohydrate tolerance.',
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/marathon-gel-guide/"
+  jsonLd={webPageJsonLd({ title, description, path: '/marathon-gel-guide/' })}
+>
+  <main style="max-width:820px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">Guide</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3rem);line-height:1.08;margin:10px 0 0;">
+      Marathon &amp; half-marathon fuelling
+    </h1>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:16px 0 0;">
+      Everything here is a <strong>training-tested starting point</strong> — the defaults our calculator uses, explained.
+      Start at the lower end, test on long runs, and never try anything new on race day.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      How many carbs per hour?
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 16px;">
+      The honest answer depends on duration, not the event's name. A 90-minute half and a 2:25 half are different
+      fuelling problems:
+    </p>
+    <div class="fuel-card" style="padding:6px 18px;">
+      <table style="width:100%;border-collapse:collapse;font-family:var(--font-sans);font-size:0.9rem;">
+        <tbody>
+          {
+            CARB_BANDS.map((band) => (
+              <tr style="border-bottom:1px solid var(--color-border);">
+                <td style="padding:11px 8px 11px 0;color:var(--color-text-muted);">{band.label}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.95rem;margin:14px 0 0;">
+      For most marathoners that means <strong>60 g/h as the working default</strong>, and 30–45 g/h for a typical half.
+      90–120 g/h is real but belongs to gut-trained athletes who have built up to it across a training block.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Why glucose + fructose beats glucose alone
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 0;">
+      Glucose (usually as maltodextrin) and fructose cross the gut wall through <em>different transporters</em> — SGLT1
+      and GLUT5. One pathway saturates around 60 g/h; using both is what unlocks higher intakes. Start with a
+      <strong>2:1 maltodextrin:fructose</strong> mix — gentler and less sweet. The modern <strong>1:0.8</strong> ratio
+      supports 90 g/h+ but earns the label "gut-trained — build up to this in training".
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Sodium and fluids
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 0;">
+      Working range <strong>400–900 mg sodium per hour</strong> — the high end for heavy sweaters and warm days.
+      Fluids roughly <strong>400–700 ml/h</strong>, adjusted to thirst and weather. Table salt works; sodium citrate
+      tastes gentler at higher doses. If you have high blood pressure, kidney issues or a sodium-restricted diet, talk
+      to a professional before adding sodium to anything.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Race-day timeline
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+      {
+        timeline.map((step) => (
+          <div class="fuel-card" style="padding:16px 20px;">
+            <p class="fuel-eyebrow" style="margin:0;">{step.t}</p>
+            <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:6px 0 0;">{step.body}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      The five common mistakes
+    </h2>
+    <ul style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 0;padding-left:20px;">
+      {mistakes.map((m) => <li style="margin-top:6px;">{m}</li>)}
+    </ul>
+
+    <div class="fuel-card fuel-card-green" style="padding:24px;margin-top:36px;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">Put numbers on it</h2>
+      <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:10px 0 16px;">
+        The calculator turns these defaults into a gram-accurate recipe and shows what a training block costs in gels
+        versus DIY mix. The prompt generator gets your AI to check current gel prices in your country.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/running-gel-cost-calculator/?sport=marathon" class="fuel-btn fuel-btn-accent" style="font-size:14px;"
+          >Race Fuel Cost Calculator →</a
+        >
+        <a
+          href="/ai-race-fuel-prompt-generator/"
+          class="fuel-btn"
+          style="font-size:14px;background:var(--color-green);color:#fff;box-shadow:0 4px 0 #33532A;"
+          >Prompt Generator →</a
+        >
+      </div>
+    </div>
+
+    <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.85rem;margin:28px 0 0;">
+      Not medical advice. If you have diabetes or glucose-control issues, kidney disease, high blood pressure, a
+      heart-rhythm condition or relevant allergies, read the <a href="/disclaimer/" style="color:var(--color-accent);font-weight:700;">disclaimer</a>
+      and talk to a professional first.
+    </p>
+  </main>
+</BaseLayout>

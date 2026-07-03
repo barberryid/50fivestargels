@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { webPageJsonLd } from '../lib/seo';
+
+const title = 'HYROX fuelling guide — you may not need mid-race gels at all';
+const description =
+  'An honest HYROX fuelling plan: why sub-75-minute athletes usually need nothing mid-race, what to do by expected finish time, and the pre-race routine that actually matters.';
+
+const finishBands = [
+  {
+    time: 'Sub-60 minutes',
+    plan: 'Pre-race fuelling only. No mid-race gel by default — your glycogen covers this comfortably if you arrive fuelled.',
+  },
+  {
+    time: '60–75 minutes',
+    plan: 'Optional pre-start gel or carb drink. Mid-race fuel is usually unnecessary; if anything, a few sips of carb drink between stations.',
+  },
+  {
+    time: '75–100 minutes',
+    plan: 'One gel or a carb-drink strategy during the runs is a reasonable starting point — practise it in compromised training first.',
+  },
+  {
+    time: '100+ minutes',
+    plan: 'Treat it like endurance-race fuelling: work towards a per-hour carb target with the calculator, tested in training.',
+  },
+];
+
+const timeline = [
+  { t: 'T-3h', body: 'High-carb, low-fibre meal. Familiar food, nothing heavy — you want glycogen without gut ballast during wall balls.' },
+  { t: 'T-1h', body: 'Carb snack: banana, white toast and honey, or a sports drink.' },
+  { t: 'T-30min', body: 'Optional top-up gel or carb drink. If you use caffeine: 3–6 mg/kg in this window, from measured doses, tested in training — never on race day for the first time.' },
+  { t: 'During', body: 'Fluids to thirst — roughly 400–700 ml/h equivalent for longer races, and sodium 400–900 mg/h only if you are a heavy sweater in a warm venue. For most athletes under ~75 minutes, water is enough.' },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/hyrox-gel-guide/"
+  jsonLd={webPageJsonLd({ title, description, path: '/hyrox-gel-guide/' })}
+>
+  <main style="max-width:820px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">Guide</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3rem);line-height:1.08;margin:10px 0 0;">HYROX fuelling</h1>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:16px 0 0;">
+      Here is the honest version, and it may save you money: <strong>most HYROX races finish in 60–90 minutes, and
+      under ~75 minutes you generally don't need mid-race fuel at all.</strong> The win is carb loading, the
+      race-morning routine, and arriving at the start line fuelled — not a gel between the sled push and burpee broad
+      jumps.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Why mid-race gels are risky in HYROX specifically
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 0;">
+      Unlike a steady road race, HYROX spikes your heart rate repeatedly across eight stations. Digestion effectively
+      pauses at those intensities, so a gel taken before a max-effort station is more likely to sit in your stomach —
+      or come back up — than to fuel anything. If you do fuel mid-race, it happens on the runs, in small doses, and it
+      has been rehearsed in training that mimics race intensity.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Your plan by expected finish time
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+      {
+        finishBands.map((band) => (
+          <div class="fuel-card" style="padding:16px 20px;">
+            <p style="font-family:var(--font-sans);font-size:0.95rem;font-weight:800;margin:0;">{band.time}</p>
+            <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:6px 0 0;">{band.plan}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      The race-day timeline that actually matters
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+      {
+        timeline.map((step) => (
+          <div class="fuel-card" style="padding:16px 20px;">
+            <p class="fuel-eyebrow" style="margin:0;">{step.t}</p>
+            <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:6px 0 0;">{step.body}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Doubles, relays and back-to-back events
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.7;margin:10px 0 0;">
+      Racing twice in a weekend (or doubles with short recovery) changes the maths: recovery carbs between efforts
+      matter more than anything mid-race. Get carbs and fluids in within the first hour after finishing, and treat the
+      second race's morning like the first.
+    </p>
+
+    <div class="fuel-card fuel-card-green" style="padding:24px;margin-top:36px;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">
+        If your race runs long, put numbers on it
+      </h2>
+      <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:10px 0 16px;">
+        The calculator's HYROX preset defaults sensibly by finish time — and tells you when the answer is "you don't
+        need to buy anything".
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/running-gel-cost-calculator/?sport=hyrox" class="fuel-btn fuel-btn-accent" style="font-size:14px;"
+          >Race Fuel Cost Calculator →</a
+        >
+        <a
+          href="/ai-race-fuel-prompt-generator/"
+          class="fuel-btn"
+          style="font-size:14px;background:var(--color-green);color:#fff;box-shadow:0 4px 0 #33532A;"
+          >Build my HYROX plan prompt →</a
+        >
+      </div>
+    </div>
+
+    <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.85rem;margin:28px 0 0;">
+      Not medical advice — everything here is a training-tested starting point. See the
+      <a href="/disclaimer/" style="color:var(--color-accent);font-weight:700;">disclaimer</a> for medical caveats.
+    </p>
+  </main>
+</BaseLayout>
