@@ -53,6 +53,10 @@ Pages project is connected. (confirmed 2026-07-02)
 - Prompt generator React island: `src/components/promptgen/PromptGenerator.tsx`
 - Prompt assembly (pure functions): `src/lib/promptBuilder.ts`
 - Starter assumptions & default prices: `src/data/defaults.ts`
+- Commercial gel dataset (phase 2, powers calculator mode 3): `src/data/gels.ts`
+- Guides: `src/pages/marathon-gel-guide.astro`, `src/pages/hyrox-gel-guide.astro`
+- About / Disclaimer: `src/pages/about.astro`, `src/pages/disclaimer.astro`
+- Default OG/social image: `public/images/social/default-og.png`
 - Layouts: `src/layouts/BaseLayout.astro`
 - Site chrome: `src/components/Header.astro`, `src/components/Footer.astro`
 - SEO: `src/components/SeoHead.astro`, `src/lib/seo.ts` (SITE_URL placeholder — update with the real domain)
