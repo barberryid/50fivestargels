@@ -3,10 +3,9 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 
+// Live on Cloudflare Pages since 2026-07-02.
 // TODO: replace `site` with the custom domain once one is chosen and
-// connected in Cloudflare Pages. Until then this is the default
-// *.pages.dev URL a Pages project named "50fivestargels" will get —
-// confirm it after creating the project.
+// connected in the Pages project.
 export default defineConfig({
   site: 'https://50fivestargels.pages.dev',
   output: 'static',

@@ -22,7 +22,7 @@ them in as each piece of account-level setup is completed.
 ## Websites
 
 - Production domain: [TODO: not chosen/connected yet]
-- Cloudflare Pages preview URL: [TODO: expected https://50fivestargels.pages.dev once the Pages project exists]
+- Cloudflare Pages URL: https://50fivestargels.pages.dev (live since 2026-07-02)
 - GitHub repo: https://github.com/barberryid/50fivestargels
 - Sister site (conventions source): https://50fivestarhotels.com
 
@@ -41,7 +41,7 @@ them in as each piece of account-level setup is completed.
     git push
 
 Pushing to main triggers a Cloudflare Pages deploy automatically once the
-Pages project is connected. [TODO: confirm after first successful deploy]
+Pages project is connected. (confirmed 2026-07-02)
 
 ## Key file paths
 
@@ -72,7 +72,7 @@ Mirroring the hotels project's convention — none created yet:
 
 ## Cloudflare Pages
 
-- Project: [TODO: not created yet — Dashboard, Workers & Pages, Create, Pages, Connect to Git, select 50fivestargels]
+- Project: 50fivestargels — live at https://50fivestargels.pages.dev
 - Production branch: `main`
 - Build command: `npm run build`
 - Build output directory: `dist`

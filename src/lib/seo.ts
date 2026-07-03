@@ -1,4 +1,4 @@
-// TODO: switch SITE_URL to the custom domain once it exists in Cloudflare Pages.
+// Live: https://50fivestargels.pages.dev - TODO: switch SITE_URL to a custom domain when one is connected.
 export const SITE_URL = 'https://50fivestargels.pages.dev';
 export const siteName = '50FiveStarGels';
 export const defaultDescription =
