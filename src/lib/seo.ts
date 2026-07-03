@@ -14,7 +14,7 @@ export function canonicalUrl(path: string) {
 }
 
 export function imageUrl(path?: string) {
-  if (!path) return undefined;
+  if (!path) return absoluteUrl('/images/social/default-og.png');
   if (path.startsWith('http')) return path;
   return absoluteUrl(path);
 }
