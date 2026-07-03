@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { webPageJsonLd } from '../lib/seo';
+
+const title = 'Disclaimer — 50FiveStarGels';
+const description =
+  'Safety and medical caveats for the Race Fuel Cost Calculator, prompt generator and guides: training-tested starting points, never medical advice.';
+
+const medical = [
+  {
+    who: 'Diabetes or glucose-control conditions',
+    why: 'Everything on this site is concentrated carbohydrate. Fuelling strategies interact directly with blood glucose management — plan with your clinician, not a calculator.',
+  },
+  {
+    who: 'Kidney disease, high blood pressure, or a sodium-restricted diet',
+    why: 'The sodium ranges here (400–900 mg/h) assume healthy kidneys and normal blood pressure. Do not add sodium to your fuelling against medical advice.',
+  },
+  {
+    who: 'Caffeine sensitivity or heart-rhythm conditions',
+    why: 'The 3–6 mg/kg caffeine guidance is a general sports-science range, not a personal prescription. Caffeine raises heart rate and can trigger arrhythmias in susceptible people.',
+  },
+  {
+    who: 'History of GI distress',
+    why: 'Concentrated carbohydrate is a common trigger. Start well below the default targets and increase only as tolerated.',
+  },
+  {
+    who: 'Heat-illness risk',
+    why: 'Hot and humid conditions change fluid, sodium and carbohydrate needs substantially. When in doubt, prioritise fluids and cooling over hitting a carb number.',
+  },
+  {
+    who: 'Allergies and intolerances',
+    why: 'Check every ingredient — commercial gels and DIY ingredients alike. Fructose malabsorption in particular makes standard glucose:fructose ratios a bad fit.',
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/disclaimer/"
+  jsonLd={webPageJsonLd({ title, description, path: '/disclaimer/' })}
+>
+  <main style="max-width:720px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">The small print, in plain language</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3rem);line-height:1.08;margin:10px 0 0;">Disclaimer</h1>
+
+    <p style="color:var(--color-text-muted);line-height:1.75;margin:22px 0 0;">
+      <strong>Nothing on this site is medical advice.</strong> The calculator, the prompt generator and the guides
+      produce <strong>training-tested starting points</strong> based on general sports-science ranges. They know
+      nothing about your health, medications, or history. You are responsible for testing anything you try — in
+      training, gradually, never for the first time on race day.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      Talk to a professional first if any of these apply
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+      {
+        medical.map((item) => (
+          <div class="fuel-card" style="padding:16px 20px;">
+            <p style="font-family:var(--font-sans);font-size:0.95rem;font-weight:800;margin:0;">{item.who}</p>
+            <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.92rem;margin:6px 0 0;">{item.why}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">About caffeine</h2>
+    <p style="color:var(--color-text-muted);line-height:1.75;margin:10px 0 0;">
+      Caffeine is deliberately excluded from the calculator's recipes. The general guidance (3–6 mg per kg of
+      bodyweight, 30–60 minutes before, tested in training) appears as a note only. <strong>Never handle pure caffeine
+      powder</strong> — the difference between a dose and a dangerous dose is smaller than kitchen scales can measure.
+      Use commercial products with a stated, measured dose.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">
+      About the numbers
+    </h2>
+    <p style="color:var(--color-text-muted);line-height:1.75;margin:10px 0 0;">
+      The gut-load indicator is an <strong>estimate</strong> derived from carbohydrate concentration, ingredient type
+      and sodium — not a laboratory osmolality measurement, which cannot be computed reliably from consumer
+      ingredients. Commercial product prices are typical single-unit prices at the date shown and will drift; sodium
+      and caffeine vary by flavour. Costs from the calculator are estimates built from the ingredient prices you enter.
+    </p>
+
+    <p style="color:var(--color-text-muted);line-height:1.75;font-size:0.9rem;margin:32px 0 0;">
+      Questions about how something is calculated? The methodology is described alongside each tool, and the
+      <a href="/about/" style="color:var(--color-accent);font-weight:700;">About page</a> explains the site's approach.
+    </p>
+  </main>
+</BaseLayout>

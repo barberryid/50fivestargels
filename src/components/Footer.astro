@@ -1,4 +1,27 @@
 ---
+const columns = [
+  {
+    title: 'Tools',
+    links: [
+      { href: '/running-gel-cost-calculator/', label: 'Race Fuel Cost Calculator' },
+      { href: '/ai-race-fuel-prompt-generator/', label: 'AI Race Fuel Prompt Generator' },
+    ],
+  },
+  {
+    title: 'Guides',
+    links: [
+      { href: '/marathon-gel-guide/', label: 'Marathon & half fuelling' },
+      { href: '/hyrox-gel-guide/', label: 'HYROX fuelling' },
+    ],
+  },
+  {
+    title: 'More',
+    links: [
+      { href: '/about/', label: 'About' },
+      { href: '/disclaimer/', label: 'Disclaimer' },
+    ],
+  },
+];
 const year = new Date().getFullYear();
 ---
 
@@ -6,7 +29,7 @@ const year = new Date().getFullYear();
   style="background:#211F1A;color:#C8C1AE;border-top:3px solid var(--color-accent);font-family:var(--font-body);margin-top:64px;"
 >
   <div style="max-width:1180px;margin:0 auto;padding:clamp(36px,5vw,56px) clamp(18px,4vw,40px) 26px;">
-    <div style="display:flex;flex-wrap:wrap;gap:28px 56px;justify-content:space-between;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px 40px;">
       <div style="max-width:38ch;">
         <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
           <img src="/favicon.svg" alt="" width="26" height="26" style="display:block;border-radius:6px;" />
@@ -17,32 +40,32 @@ const year = new Date().getFullYear();
           try anything new on race day.
         </p>
       </div>
-      <div>
-        <p
-          style="font-family:var(--font-sans);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#8D8676;margin:0 0 12px;"
-        >
-          Tools
-        </p>
-        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;">
-          <li>
-            <a href="/running-gel-cost-calculator/" style="font-size:15px;color:#C8C1AE;text-decoration:none;"
-              >Race Fuel Cost Calculator</a
-            >
-          </li>
-          <li>
-            <a href="/ai-race-fuel-prompt-generator/" style="font-size:15px;color:#C8C1AE;text-decoration:none;"
-              >AI Race Fuel Prompt Generator</a
-            >
-          </li>
-        </ul>
-      </div>
+      {
+        columns.map((col) => (
+          <div>
+            <p style="font-family:var(--font-sans);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#8D8676;margin:0 0 12px;">
+              {col.title}
+            </p>
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;">
+              {col.links.map((link) => (
+                <li>
+                  <a href={link.href} style="font-size:15px;color:#C8C1AE;text-decoration:none;">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </div>
     <div
       style="display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;border-top:1px solid #3A362E;margin-top:clamp(28px,4vw,44px);padding-top:20px;"
     >
       <p style="font-size:13px;color:#8D8676;margin:0;">
-        © {year} 50FiveStarGels · Not medical advice. If you have diabetes, kidney disease, high blood pressure or a
-        heart condition, talk to a professional before changing your fuelling.
+        © {year} 50FiveStarGels · <a href="/disclaimer/" style="color:#8D8676;">Not medical advice</a> — if you have
+        diabetes, kidney disease, high blood pressure or a heart condition, talk to a professional before changing your
+        fuelling.
       </p>
     </div>
   </div>

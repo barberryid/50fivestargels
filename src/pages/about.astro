@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { webPageJsonLd } from '../lib/seo';
+
+const title = 'About 50FiveStarGels';
+const description =
+  'Why this site exists: a clearer, cheaper way to compare commercial gels with DIY carb mixes — built by an athlete who was going through a lot of gels.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/about/"
+  jsonLd={webPageJsonLd({ title, description, path: '/about/', type: 'AboutPage' })}
+>
+  <main style="max-width:720px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
+    <p class="fuel-eyebrow">About</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3rem);line-height:1.08;margin:10px 0 0;">Why this site exists</h1>
+
+    <p style="color:var(--color-text-muted);line-height:1.75;font-size:1.05rem;margin:22px 0 0;">
+      I built this because I was going through a lot of gels in HYROX and endurance training and wanted a clearer,
+      cheaper way to compare commercial gels with DIY carb mixes.
+    </p>
+    <p style="color:var(--color-text-muted);line-height:1.75;margin:16px 0 0;">
+      The core question was never "what's the best gel?" — it was <em>"what's the cheapest reliable way to hit my
+      carbohydrate and sodium targets for this race or training block?"</em> That's a maths question, so the answer is
+      a calculator rather than another product roundup.
+    </p>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">How the site works</h2>
+    <ul style="color:var(--color-text-muted);line-height:1.75;margin:10px 0 0;padding-left:20px;">
+      <li style="margin-top:6px;">
+        <strong>The calculator</strong> prices everything per gram of carbohydrate — the only fair way to compare a
+        €1.10 supermarket gel, a €4 hydrogel and a homemade maltodextrin mix.
+      </li>
+      <li style="margin-top:6px;">
+        <strong>The prompt generator</strong> hands the fast-moving part — current prices and availability in your
+        country — to your own AI assistant, so nothing here goes stale.
+      </li>
+      <li style="margin-top:6px;">
+        <strong>The guides</strong> stick to duration-based defaults and honest caveats, including telling HYROX
+        athletes when the answer is "you don't need to buy anything".
+      </li>
+    </ul>
+
+    <h2 style="font-family:var(--font-sans);font-size:1.2rem;font-weight:800;margin:36px 0 0;">The editorial stance</h2>
+    <p style="color:var(--color-text-muted);line-height:1.75;margin:10px 0 0;">
+      Practical, evidence-informed, cost-conscious. Commercial gels genuinely earn their place on race day; DIY mixes
+      genuinely save money in training. Every formula on this site is a <strong>training-tested starting point</strong>
+      — never medical advice, never a race-day experiment. No product pays to appear here.
+    </p>
+
+    <p style="color:var(--color-text-muted);line-height:1.75;font-size:0.9rem;margin:32px 0 0;">
+      50FiveStarGels is a sister site to
+      <a href="https://50fivestarhotels.com" style="color:var(--color-accent);font-weight:700;">50FiveStarHotels</a>,
+      under the 50FiveStar umbrella.
+    </p>
+  </main>
+</BaseLayout>
