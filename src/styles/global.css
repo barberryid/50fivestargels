@@ -44,6 +44,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -150,4 +151,28 @@ summary:focus-visible {
 
 .gel-shadow {
   animation: shadow-idle 1.7s ease-in-out infinite;
+}
+
+@media (max-width: 760px) {
+  h1,
+  h2,
+  h3,
+  p,
+  a,
+  button {
+    overflow-wrap: anywhere;
+  }
+
+  h1 {
+    line-height: 0.98;
+  }
+
+  .fuel-card {
+    border-radius: 8px;
+  }
+
+  .fuel-btn {
+    min-height: 44px;
+    padding-inline: 0.9rem;
+  }
 }

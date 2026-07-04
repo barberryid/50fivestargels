@@ -6,19 +6,22 @@ const links = [
 ---
 
 <header
+  class="site-header"
   style="position:sticky;top:0;z-index:60;background:rgba(243,243,233,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--color-border);"
 >
   <div
+    class="site-header-inner"
     style="max-width:1180px;margin:0 auto;height:64px;padding:0 clamp(18px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:16px;"
   >
-    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <a href="/" class="site-brand" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
       <img src="/images/logo-star.svg" alt="" width="28" height="28" style="display:block;" />
       <span
+        class="site-brand-text"
         style="font-family:var(--font-serif);font-size:17px;text-transform:uppercase;letter-spacing:-0.01em;color:var(--color-accent);white-space:nowrap;"
         >50FiveStarGels</span
       >
     </a>
-    <nav style="display:flex;align-items:center;gap:6px;" aria-label="Main navigation">
+    <nav class="site-nav" style="display:flex;align-items:center;gap:6px;" aria-label="Main navigation">
       {
         links.map((link) => (
           <a
@@ -40,5 +43,70 @@ const links = [
 <style>
   .header-nav-link:hover {
     color: var(--color-accent);
+  }
+
+  @media (max-width: 760px) {
+    .site-header-inner {
+      height: auto !important;
+      padding: 10px 12px 12px !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+    }
+
+    .site-brand {
+      min-width: 0;
+    }
+
+    .site-brand-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-nav {
+      width: 100%;
+      overflow-x: auto;
+      padding: 6px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+      scrollbar-width: none;
+    }
+
+    .site-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .site-nav::before {
+      content: "Menu";
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 7px;
+      background: var(--color-accent);
+      color: var(--color-bg);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .header-nav-link,
+    .site-nav .fuel-btn {
+      flex: 0 0 auto;
+      min-height: 36px !important;
+      padding: 0 11px !important;
+      border-radius: 7px !important;
+      font-size: 12px !important;
+      white-space: nowrap;
+    }
+
+    .site-nav .fuel-btn {
+      box-shadow: none !important;
+    }
   }
 </style>
