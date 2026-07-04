@@ -33,7 +33,14 @@ import {
 } from '../../data/gels';
 import UnitToggle, { useUnitSystem } from '../UnitToggle';
 import { copyToClipboard } from '../../lib/clipboard';
-import { displayWeight, volumeLabel, weightBounds, weightToKg, weightUnit as weightUnitFor } from '../../lib/units';
+import {
+  currencyForSystem,
+  displayWeight,
+  volumeLabel,
+  weightBounds,
+  weightToKg,
+  weightUnit as weightUnitFor,
+} from '../../lib/units';
 
 type Mode = 'bottle' | 'syrup' | 'commercial';
 
@@ -208,6 +215,13 @@ export default function RaceFuelCalculator() {
     setState((s) => ({ ...s, ...parseParams(window.location.search) }));
     setReady(true);
   }, []);
+
+  // Currency follows the unit system (Metric €, American $, UK Hybrid £),
+  // including the system restored from localStorage on load. Still editable
+  // by hand in the price panel afterwards.
+  useEffect(() => {
+    setState((s) => ({ ...s, prices: { ...s.prices, currency: currencyForSystem(unitSystem) } }));
+  }, [unitSystem]);
 
   const carbsPerHour = state.carbsOverride ?? defaultCarbsPerHour(state.durationMin);
   const carbsWarning =

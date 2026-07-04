@@ -60,3 +60,10 @@ export function weightBounds(system: UnitSystem): { min: number; max: number } {
 export function volumeLabel(ml: number, system: UnitSystem): string {
   return system === 'us' ? `${Math.round(mlToFlOz(ml) * 10) / 10} fl oz` : `${ml} ml`;
 }
+
+// Currency label by unit system: Metric → €, American → $, UK Hybrid → £.
+// A display label only — the cost maths is currency-agnostic and the symbol
+// stays editable in the price panel.
+export function currencyForSystem(system: UnitSystem): '€' | '$' | '£' {
+  return system === 'us' ? '$' : system === 'uk' ? '£' : '€';
+}
