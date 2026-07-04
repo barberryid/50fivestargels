@@ -34,6 +34,12 @@ const goalCardCls = (selected: boolean) =>
       : 'border-border bg-white hover:border-accent-deep'
   }`;
 
+const CARBS_PRESETS = [
+  { value: 45, label: 'Cautious gut' },
+  { value: 60, label: 'Standard' },
+  { value: 90, label: 'Trained gut' },
+] as const;
+
 const INITIAL: PromptAnswers = {
   sport: 'marathon',
   durationMin: SPORT_PRESETS.marathon.durationMin,
@@ -67,10 +73,18 @@ export default function PromptGenerator() {
   const [answers, setAnswers] = useState<PromptAnswers>(INITIAL);
   const [type, setType] = useState<PromptType>('find-gels');
   const [copied, setCopied] = useState(false);
+  const [showCarbsHelp, setShowCarbsHelp] = useState(false);
   const patch = (p: Partial<PromptAnswers>) => {
     setAnswers((a) => ({ ...a, ...p }));
     setCopied(false);
   };
+
+  const carbsWarning =
+    answers.carbsPerHour > 90
+      ? { tone: 'amber' as const, text: "High intake — only recommended if you've trained your gut for it." }
+      : answers.carbsPerHour < 30
+        ? { tone: 'muted' as const, text: "That's quite low for a long session — most runners need at least 30 g/h." }
+        : null;
 
   const prompt = useMemo(() => buildPrompt(type, answers), [type, answers]);
   const wordCount = useMemo(() => prompt.trim().split(/\s+/).length, [prompt]);
@@ -209,10 +223,26 @@ export default function PromptGenerator() {
                 </span>
               </span>
             </label>
-            <label className="flex flex-col gap-[7px]">
-              <span className={fieldLabelCls}>Target carbs</span>
+            <div className="col-span-1 flex flex-col gap-[7px] sm:col-span-2 lg:col-span-1">
+              <label className={fieldLabelCls} htmlFor="pg-carbs">
+                Target carbs
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {CARBS_PRESETS.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    aria-pressed={answers.carbsPerHour === p.value}
+                    className={chipCls(answers.carbsPerHour === p.value)}
+                    onClick={() => patch({ carbsPerHour: p.value })}
+                  >
+                    {p.label} · {p.value}
+                  </button>
+                ))}
+              </div>
               <span className="relative block">
                 <input
+                  id="pg-carbs"
                   type="number"
                   min="10"
                   max="150"
@@ -220,12 +250,43 @@ export default function PromptGenerator() {
                   className={`${fieldInputCls} pr-12`}
                   value={answers.carbsPerHour}
                   onChange={(e) => patch({ carbsPerHour: Math.max(10, Number(e.target.value) || 10) })}
+                  aria-describedby={`pg-carbs-help${carbsWarning ? ' pg-carbs-warning' : ''}`}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
                   g/h
                 </span>
               </span>
-            </label>
+              <p id="pg-carbs-help" className="m-0 font-body text-[13px] text-text-muted">
+                Most runners handle 45–60 g/h. Above 90 g/h needs practice in training.{' '}
+                <button
+                  type="button"
+                  aria-expanded={showCarbsHelp}
+                  onClick={() => setShowCarbsHelp((v) => !v)}
+                  className="cursor-pointer border-0 bg-transparent p-0 font-sans text-[13px] font-bold text-accent underline underline-offset-2"
+                >
+                  How do I choose?
+                </button>
+              </p>
+              {showCarbsHelp && (
+                <ul className="m-0 list-disc space-y-0.5 pl-4 font-body text-[13px] text-text-muted">
+                  <li>Under ~2.5 h: 30–60 g/h is plenty.</li>
+                  <li>Marathon and longer: 60–90 g/h.</li>
+                  <li>90–120 g/h: only if you've practiced high intake repeatedly in training.</li>
+                </ul>
+              )}
+              {carbsWarning && (
+                <p
+                  id="pg-carbs-warning"
+                  className={`m-0 font-body text-[13px] leading-relaxed ${
+                    carbsWarning.tone === 'amber'
+                      ? 'rounded-md border border-amber bg-amber-soft px-2 py-1 text-amber'
+                      : 'text-text-muted'
+                  }`}
+                >
+                  {carbsWarning.text}
+                </p>
+              )}
+            </div>
             <label className="flex flex-col gap-[7px]">
               <span className={fieldLabelCls}>Sweat level</span>
               <select
