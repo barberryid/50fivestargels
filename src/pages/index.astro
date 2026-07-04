@@ -20,10 +20,11 @@ const cards = [
   },
 ];
 
-const comingNext = [
-  'AI fuelling prompt generator',
-  'Marathon & HYROX fuelling guides',
-  'Commercial gel comparison',
+const fuelingLinks = [
+  { label: 'AI fuelling prompt generator', href: '/ai-race-fuel-prompt-generator/' },
+  { label: 'Marathon fuelling guide', href: '/marathon-gel-guide/' },
+  { label: 'HYROX fuelling guide', href: '/hyrox-gel-guide/' },
+  { label: 'Commercial gel comparison', href: '/running-gel-cost-calculator/?mode=commercial' },
 ];
 ---
 
@@ -105,7 +106,7 @@ const comingNext = [
         <nav style="display:flex;align-items:center;gap:36px;padding-top:10px;">
           <a href="#calculator" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Calculator</a>
           <a href="#what-you-get" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">What you get</a>
-          <a href="#coming-next" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Coming next</a>
+          <a href="#coming-next" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Get fueling</a>
         </nav>
         <a
           href="/running-gel-cost-calculator/"
@@ -172,16 +173,20 @@ const comingNext = [
       </div>
     </section>
 
-    <!-- ======================= COMING NEXT ======================= -->
+    <!-- ======================= GET FUELING ======================= -->
     <section id="coming-next" style="background:var(--color-accent);overflow:hidden;">
       <div style="max-width:1280px;margin:0 auto;padding:clamp(64px,8vw,110px) clamp(1rem,4vw,3rem);">
-        <h2 style="font-family:var(--font-serif);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-bg);margin:0 0 clamp(32px,4vw,56px);letter-spacing:-0.02em;">Coming<br />next</h2>
+        <h2 style="font-family:var(--font-serif);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-bg);margin:0 0 clamp(32px,4vw,56px);letter-spacing:-0.02em;">Get<br />fueling</h2>
         <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:32px;">
           {
-            comingNext.map((label) => (
-              <span style="font-family:var(--font-serif);font-size:21px;letter-spacing:0;text-transform:uppercase;color:var(--color-accent);background:var(--color-bg);padding:14px 28px;border-radius:9999px;">
-                {label}
-              </span>
+            fuelingLinks.map((link) => (
+              <a
+                href={link.href}
+                class="gel-fueling-link"
+                style="font-family:var(--font-serif);font-size:21px;letter-spacing:0;text-transform:uppercase;color:var(--color-accent);background:var(--color-bg);padding:14px 28px;border-radius:9999px;text-decoration:none;transition:transform 160ms ease,background 160ms ease,color 160ms ease;"
+              >
+                {link.label}
+              </a>
             ))
           }
         </div>
@@ -217,6 +222,11 @@ const comingNext = [
     }
     .gel-card:hover {
       transform: translateY(-6px);
+    }
+    .gel-fueling-link:hover {
+      background: #000 !important;
+      color: var(--color-bg) !important;
+      transform: translateY(-2px);
     }
     html {
       scroll-behavior: smooth;
