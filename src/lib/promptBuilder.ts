@@ -13,7 +13,7 @@ export type PromptType =
 
 export type Budget = 'value' | 'mid' | 'premium';
 export type Preference = 'commercial' | 'diy' | 'both';
-export type Container = 'bottles' | 'soft-flasks' | 'gels-only';
+export type Container = 'bottles' | 'gels' | 'vest' | 'course';
 
 export interface PromptAnswers {
   sport: SportKey;
@@ -59,19 +59,20 @@ export const PROMPT_TYPES: Record<PromptType, { label: string; blurb: string }> 
 const BUDGET_LABELS: Record<Budget, string> = {
   value: 'budget-focused — cheapest reliable option matters most',
   mid: 'balanced — value matters but so does convenience',
-  premium: 'premium okay — happy to pay for the right product',
+  premium: 'price is not a constraint',
 };
 
 const PREFERENCE_LABELS: Record<Preference, string> = {
-  commercial: 'prefer ready-made commercial products',
-  diy: 'prefer DIY mixes I make myself',
+  commercial: 'commercial products only',
+  diy: 'DIY / homemade fuel preferred',
   both: 'open to both commercial products and DIY mixes',
 };
 
 const CONTAINER_LABELS: Record<Container, string> = {
   bottles: 'bottles (drink mix)',
-  'soft-flasks': 'soft flasks (concentrated syrup)',
-  'gels-only': 'gels only (no bottles or flasks)',
+  gels: 'gels carried in pockets or a belt',
+  vest: 'hydration vest',
+  course: 'relying on what the course provides',
 };
 
 function sportLabel(a: PromptAnswers): string {
@@ -90,8 +91,8 @@ function profileBlock(a: PromptAnswers): string {
     `- Bodyweight: ${a.weightKg} kg`,
     `- Target carbohydrate intake: ${a.carbsPerHour} g/hour`,
     `- Sweat level: ${a.sweat} (sodium target ~${SODIUM_BY_SWEAT[a.sweat]} mg/hour)`,
-    `- Sensitive stomach: ${a.sensitiveStomach ? 'yes — prioritise gentle, well-tolerated options' : 'no known issues'}`,
-    `- Caffeine: ${a.usesCaffeine ? 'I use caffeine (within 3–6 mg/kg guidance, tested in training)' : 'I avoid caffeine — caffeine-free options only'}`,
+    `- Sensitive stomach: ${a.sensitiveStomach ? 'yes — prioritise gentle options' : 'no known issues'}`,
+    `- Caffeine: ${a.usesCaffeine ? 'yes — include caffeinated options and timing' : 'I avoid caffeine — caffeine-free options only'}`,
     `- Country: ${countryLabel(a)}`,
     `- Budget: ${BUDGET_LABELS[a.budget]}`,
     `- Preference: ${PREFERENCE_LABELS[a.preference]}`,

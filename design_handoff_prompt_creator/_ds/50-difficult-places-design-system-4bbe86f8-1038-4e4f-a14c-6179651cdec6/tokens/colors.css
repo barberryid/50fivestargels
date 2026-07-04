@@ -1,0 +1,45 @@
+/* Color tokens — 50 Difficult Places
+   Warm editorial palette. National-Geographic-meets-print-guide.
+   Do not invent colors outside this set. */
+:root {
+  /* ---- Base palette ---- */
+  --ink: #15201d;        /* near-black green — primary text, dark surfaces */
+  --muted: #5c6762;      /* muted secondary text */
+  --forest: #1f4c3b;     /* deep green — headings accent, success, facts */
+  --clay: #b85832;       /* terracotta — primary accent, buttons */
+  --clay-text: #8d3f1f;  /* rust — eyebrows, labels, links on cream */
+  --gold: #c49a3a;       /* gold — hero eyebrow, premium accents */
+  --cream: #fdfaf3;      /* warm cream — page background */
+  --sand: #ddd6c4;       /* sand — hairline borders, dividers */
+  --tag-bg: #f5f0e6;     /* tag / chip fill on cream */
+
+  /* ---- Semantic aliases ---- */
+  --text-strong: var(--ink);
+  --text-body: #283531;        /* slightly lifted ink for long-form reading */
+  --text-muted: var(--muted);
+  --text-accent: var(--clay-text);
+  --text-on-dark: #f4efe4;
+
+  --surface-page: var(--cream);
+  --surface-card: #ffffff;
+  --surface-tint: var(--tag-bg);     /* tinted card / inset panel */
+  --surface-dark: var(--ink);
+
+  --border-hairline: var(--sand);
+  --border-strong: #cdc4ad;
+
+  --accent-primary: var(--clay);
+  --accent-primary-hover: #a64c29;   /* darker clay for hover */
+  --accent-eyebrow: var(--clay-text);
+  --accent-gold: var(--gold);
+  --accent-forest: var(--forest);
+
+  /* Difficulty scale (editorial badge) */
+  --diff-easy: var(--forest);
+  --diff-moderate: var(--gold);
+  --diff-hard: var(--clay);
+
+  /* Overlays */
+  --overlay-hero: linear-gradient(180deg, rgba(21,32,29,0) 38%, rgba(21,32,29,0.55) 72%, rgba(21,32,29,0.86) 100%); /* @kind color */
+  --overlay-image-top: linear-gradient(180deg, rgba(21,32,29,0.35) 0%, rgba(21,32,29,0) 40%); /* @kind color */
+}

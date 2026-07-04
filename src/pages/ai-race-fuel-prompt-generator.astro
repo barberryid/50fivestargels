@@ -40,18 +40,21 @@ const steps = [
   canonical="/ai-race-fuel-prompt-generator/"
   jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/ai-race-fuel-prompt-generator/' })]}
 >
-  <main style="max-width:1080px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
-    <p class="fuel-eyebrow">Free tool · no sign-up</p>
-    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.05;margin:10px 0 0;">
-      AI Race Fuel Prompt Generator
-    </h1>
-    <p style="max-width:64ch;color:var(--color-text-muted);line-height:1.65;margin:16px 0 0;">
-      Gel prices and availability change constantly — a static list would be stale in a month. Instead, answer a short
-      questionnaire and get a structured prompt for your AI assistant, built to search current prices in your country
-      and rank everything by cost per gram of carbohydrate.
-    </p>
+  <main style="max-width:1280px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(1rem,4vw,3rem) 20px;">
+    <div style="max-width:680px;display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
+      <p class="fuel-eyebrow">AI race fuel · Prompt generator</p>
+      <h1 style="font-size:clamp(34px,4.5vw,52px);line-height:1.05;margin:0;">Build your fuelling prompt</h1>
+      <p style="font-size:18px;line-height:1.7;color:var(--color-text-muted);margin:0;">
+        Answer the questions below and copy the finished prompt into Claude, ChatGPT or any AI assistant. Whatever it
+        suggests is a starting point to test in training — never race on something new.
+      </p>
+    </div>
 
     <PromptGenerator client:load />
+
+    <p style="max-width:680px;margin:48px 0 0;padding-top:20px;border-top:1px solid var(--color-border);color:var(--color-text-muted);line-height:1.7;font-size:14px;">
+      Whatever your AI suggests is a starting point to test in training — never race on something new.
+    </p>
 
     <section style="margin-top:40px;">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">

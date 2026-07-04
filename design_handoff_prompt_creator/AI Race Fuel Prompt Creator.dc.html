@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/styles.css">
+  <script src="_ds/50-difficult-places-design-system-4bbe86f8-1038-4e4f-a14c-6179651cdec6/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: #fdfaf3; }
+    input:focus, select:focus, button:focus-visible { outline: 2px solid #b85832; outline-offset: 1px; }
+    input, select { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#fdfaf3;color:#15201d;font-family:Inter,system-ui,sans-serif;">
+  <div style="max-width:1280px;margin:0 auto;padding:56px clamp(16px,4vw,48px) 96px clamp(16px,4vw,48px);">
+
+    <!-- Page header -->
+    <header style="max-width:680px;display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
+      <div style="font-family:Inter,sans-serif;font-weight:800;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8d3f1f;">AI race fuel · Prompt generator</div>
+      <h1 style="font-family:'Playfair Display',serif;font-weight:600;font-size:clamp(34px,4.5vw,52px);line-height:1.05;letter-spacing:-0.025em;margin:0;">Build your fuelling prompt</h1>
+      <p style="font-family:'Source Serif 4',serif;font-size:18px;line-height:1.7;color:#5c6762;margin:0;">Answer the questions below and copy the finished prompt into Claude, ChatGPT or any AI assistant. Whatever it suggests is a starting point to test in training — never race on something new.</p>
+    </header>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:48px;align-items:start;">
+
+      <!-- LEFT: the form -->
+      <div style="display:flex;flex-direction:column;gap:44px;min-width:0;">
+
+        <!-- Step 1 -->
+        <section style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #ddd6c4;padding-bottom:12px;">
+            <div style="font-weight:800;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8d3f1f;">Step 1 · What should the AI do?</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:15px;color:#5c6762;">Pick one task. The prompt is rebuilt around it.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+            <sc-for list="{{ goalCards }}" as="g" hint-placeholder-count="6">
+              <button onClick="{{ g.onSelect }}" aria-pressed="{{ g.selected }}" style="{{ g.cardStyle }}">
+                <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                  <span style="font-family:Inter,sans-serif;font-weight:700;font-size:15px;line-height:1.3;color:#15201d;">{{ g.title }}</span>
+                  <span style="{{ g.dotStyle }}"></span>
+                </span>
+                <span style="font-family:'Source Serif 4',serif;font-size:14px;line-height:1.55;color:#5c6762;">{{ g.desc }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- Step 2 -->
+        <section style="display:flex;flex-direction:column;gap:20px;">
+          <div style="display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #ddd6c4;padding-bottom:12px;">
+            <div style="font-weight:800;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8d3f1f;">Step 2 · You and your event</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:15px;color:#5c6762;">Picking an event fills in a sensible duration — adjust anything.</div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <sc-for list="{{ eventChips }}" as="ev" hint-placeholder-count="5">
+              <button onClick="{{ ev.onSelect }}" aria-pressed="{{ ev.selected }}" style="{{ ev.chipStyle }}">{{ ev.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;">
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Expected duration</span>
+              <span style="position:relative;display:block;">
+                <input type="number" min="20" max="1440" value="{{ duration }}" onChange="{{ setDuration }}" style="width:100%;padding:11px 52px 11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;">
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:#5c6762;">min</span>
+              </span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Bodyweight</span>
+              <span style="position:relative;display:block;">
+                <input type="number" min="30" max="180" value="{{ bodyweight }}" onChange="{{ setBodyweight }}" style="width:100%;padding:11px 52px 11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;">
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:#5c6762;">{{ weightUnitLabel }}</span>
+              </span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Target carbs</span>
+              <span style="position:relative;display:block;">
+                <input type="number" min="20" max="130" step="5" value="{{ carbs }}" onChange="{{ setCarbs }}" style="width:100%;padding:11px 52px 11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;">
+                <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:#5c6762;">g/h</span>
+              </span>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Sweat level</span>
+              <select value="{{ sweat }}" onChange="{{ setSweat }}" style="width:100%;padding:11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;appearance:auto;">
+                <option value="low">Low — barely salty</option>
+                <option value="medium">Medium</option>
+                <option value="high">High — salt-crusted kit</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <!-- Step 3 -->
+        <section style="display:flex;flex-direction:column;gap:20px;">
+          <div style="display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #ddd6c4;padding-bottom:12px;">
+            <div style="font-weight:800;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8d3f1f;">Step 3 · Your preferences</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;">
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Country</span>
+              <input type="text" placeholder="e.g. Ireland" value="{{ country }}" onChange="{{ setCountry }}" style="width:100%;padding:11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;">
+              <sc-if value="{{ showCountryHint }}" hint-placeholder-val="{{ false }}">
+                <span style="font-family:'Source Serif 4',serif;font-size:13px;color:#8d3f1f;">Needed for local availability and prices — the AI can only rank what you can buy.</span>
+              </sc-if>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Budget</span>
+              <select value="{{ budget }}" onChange="{{ setBudget }}" style="width:100%;padding:11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;appearance:auto;">
+                <option value="budget">Budget-focused</option>
+                <option value="balanced">Balanced</option>
+                <option value="premium">Price is no object</option>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Commercial vs DIY</span>
+              <select value="{{ diy }}" onChange="{{ setDiy }}" style="width:100%;padding:11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;appearance:auto;">
+                <option value="both">Open to both</option>
+                <option value="commercial">Commercial products only</option>
+                <option value="diy">DIY / homemade only</option>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-weight:800;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5c6762;">Fuel carrier</span>
+              <select value="{{ carrier }}" onChange="{{ setCarrier }}" style="width:100%;padding:11px 14px;border:1px solid #ddd6c4;border-radius:10px;background:#ffffff;font-family:'Source Serif 4',serif;font-size:16px;color:#15201d;appearance:auto;">
+                <option value="bottles">Bottles (drink mix)</option>
+                <option value="gels">Gels in pockets / belt</option>
+                <option value="vest">Hydration vest</option>
+                <option value="course">Whatever the course hands out</option>
+              </select>
+            </label>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button onClick="{{ toggleStomach }}" aria-pressed="{{ sensitiveStomach }}" style="{{ stomachChipStyle }}">Sensitive stomach</button>
+            <button onClick="{{ toggleCaffeine }}" aria-pressed="{{ caffeine }}" style="{{ caffeineChipStyle }}">I use caffeine</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT: sticky prompt panel -->
+      <aside style="position:sticky;top:24px;display:flex;flex-direction:column;gap:0;background:#ffffff;border:1px solid #ddd6c4;border-radius:16px;box-shadow:0 10px 30px rgba(21,32,29,0.08);overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid #ddd6c4;">
+          <div style="font-weight:800;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8d3f1f;">Your prompt</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1f4c3b;font-weight:600;">
+            <span style="width:7px;height:7px;border-radius:999px;background:#1f4c3b;display:inline-block;"></span>
+            Updates live
+          </div>
+        </div>
+        <pre style="margin:0;padding:20px;background:#f5f0e6;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.65;color:#283531;white-space:pre-wrap;overflow-wrap:break-word;max-height:56vh;overflow-y:auto;">{{ promptText }}</pre>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:18px 20px;border-top:1px solid #ddd6c4;">
+          <x-import component-from-global-scope="Ds50DifficultPlacesDesignSystem_4bbe86.Button" on-click="{{ copyPrompt }}" style="width:100%" hint-size="100%,46px">{{ copyLabel }}</x-import>
+          <div style="font-family:'Source Serif 4',serif;font-size:13px;line-height:1.6;color:#5c6762;text-align:center;">{{ wordCount }} words · paste into Claude, ChatGPT or any assistant</div>
+        </div>
+      </aside>
+    </div>
+
+    <p style="max-width:680px;margin:48px 0 0 0;padding-top:20px;border-top:1px solid #ddd6c4;font-family:'Source Serif 4',serif;font-size:14px;line-height:1.7;color:#5c6762;">Whatever your AI suggests is a starting point to test in training — never race on something new.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;defaultGoal&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;find&quot;, &quot;options&quot;: [&quot;find&quot;, &quot;compare&quot;, &quot;marathonPlan&quot;, &quot;hyroxPlan&quot;, &quot;troubleshoot&quot;, &quot;checklist&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Behaviour&quot;},
+  &quot;weightUnit&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;kg&quot;, &quot;options&quot;: [&quot;kg&quot;, &quot;lb&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Behaviour&quot;}
+}">
+class Component extends DCLogic {
+  state = {
+    goal: this.props.defaultGoal ?? "find",
+    event: "marathon",
+    duration: 240,
+    bodyweight: 70,
+    carbs: 60,
+    sweat: "medium",
+    country: "",
+    budget: "budget",
+    diy: "both",
+    carrier: "bottles",
+    sensitiveStomach: false,
+    caffeine: false,
+    copied: false
+  };
+
+  goals = [
+    { id: "find", title: "Find gels I can buy in my country", desc: "Current availability and prices where you live, ranked by cost per gram of carb." },
+    { id: "compare", title: "Compare commercial gels vs DIY", desc: "An honest buy/make/both comparison for your training and racing." },
+    { id: "marathonPlan", title: "Build my marathon fuelling plan", desc: "Carb loading, race morning, per-hour intake and contingencies." },
+    { id: "hyroxPlan", title: "Build my HYROX fuelling plan", desc: "Pre-race-first plan — most races need little or nothing mid-race." },
+    { id: "troubleshoot", title: "Troubleshoot stomach problems", desc: "Work through GI issues with your fuelling, step by step." },
+    { id: "checklist", title: "Create my race-day checklist", desc: "A T-3h-to-finish fuelling checklist you can print." }
+  ];
+
+  events = [
+    { id: "half", label: "Half marathon", duration: 105 },
+    { id: "marathon", label: "Marathon", duration: 240 },
+    { id: "hyrox", label: "HYROX", duration: 90 },
+    { id: "longrun", label: "Long training run", duration: 120 },
+    { id: "custom", label: "Custom", duration: null }
+  ];
+
+  eventName(id) {
+    const map = { half: "Half marathon", marathon: "Marathon", hyrox: "HYROX", longrun: "Long training run", custom: "Custom event" };
+    return map[id] || id;
+  }
+
+  sodium(sweat) {
+    return { low: 400, medium: 650, high: 900 }[sweat] || 650;
+  }
+
+  profileBlock() {
+    const s = this.state;
+    const budgetLine = {
+      budget: "budget-focused — cheapest reliable option matters most",
+      balanced: "balanced — value matters but so does convenience",
+      premium: "price is not a constraint"
+    }[s.budget];
+    const diyLine = {
+      both: "open to both commercial products and DIY mixes",
+      commercial: "commercial products only",
+      diy: "DIY / homemade fuel preferred"
+    }[s.diy];
+    const carrierLine = {
+      bottles: "bottles (drink mix)",
+      gels: "gels carried in pockets or a belt",
+      vest: "hydration vest",
+      course: "relying on what the course provides"
+    }[s.carrier];
+    return [
+      "My profile:",
+      `- Sport / event: ${this.eventName(s.event)} (~${s.duration} min expected)`,
+      `- Bodyweight: ${s.bodyweight} ${this.props.weightUnit ?? "kg"}`,
+      `- Target carbohydrate intake: ${s.carbs} g/hour`,
+      `- Sweat level: ${s.sweat} (sodium target ~${this.sodium(s.sweat)} mg/hour)`,
+      `- Sensitive stomach: ${s.sensitiveStomach ? "yes — prioritise gentle options" : "no known issues"}`,
+      `- Caffeine: ${s.caffeine ? "yes — include caffeinated options and timing" : "I avoid caffeine — caffeine-free options only"}`,
+      `- Country: ${s.country.trim() || "my country"}`,
+      `- Budget: ${budgetLine}`,
+      `- Preference: ${diyLine}`,
+      `- Fuel carrier: ${carrierLine}`
+    ].join("\n");
+  }
+
+  buildPrompt() {
+    const s = this.state;
+    const caffeineWant = s.caffeine
+      ? "- Note which options contain caffeine and how much"
+      : "- Caffeine-free options only";
+    const intros = {
+      find: [
+        "Find energy gels and carbohydrate drink mixes I can actually buy in " + (s.country.trim() || "my country") + " right now.",
+        "",
+        "I want:",
+        "- A shortlist of 5–10 products available to me, with where to buy each one",
+        "- The cheapest reliable way to hit my carbohydrate target per hour",
+        "- At least one high-carb option and at least one gentle-stomach option",
+        caffeineWant
+      ],
+      compare: [
+        "Give me an honest comparison of commercial energy gels versus DIY alternatives for my training and racing.",
+        "",
+        "I want:",
+        "- A buy / make / both recommendation with reasoning",
+        "- Real cost per gram of carbohydrate for each route",
+        "- DIY recipes only if they are genuinely practical mid-race",
+        "- Where DIY falls short (osmolality, sodium, convenience) stated plainly"
+      ],
+      marathonPlan: [
+        "Build me a complete marathon fuelling plan.",
+        "",
+        "I want:",
+        "- Carb-loading protocol for the final 48 hours, with example meals",
+        "- Race-morning breakfast and timing",
+        "- A per-hour intake schedule for the race itself",
+        "- Contingencies: what to do if my stomach turns or I drop a gel",
+        caffeineWant
+      ],
+      hyroxPlan: [
+        "Build me a HYROX fuelling plan.",
+        "",
+        "I want:",
+        "- A pre-race-first plan — be honest that most HYROX races need little or nothing mid-race",
+        "- What and when to eat in the final 3 hours before my start",
+        "- Whether mid-race fuel makes sense at my expected duration, and if so what",
+        caffeineWant
+      ],
+      troubleshoot: [
+        "Help me troubleshoot stomach problems with my race fuelling, step by step.",
+        "",
+        "I want:",
+        "- The most likely causes for my situation, in order of probability",
+        "- One change to test at a time, each in training first",
+        "- Concrete alternatives (different carb ratios, drink mix instead of gels, real food)",
+        "- Clear signs that the problem is something a doctor should look at instead"
+      ],
+      checklist: [
+        "Create a printable race-day fuelling checklist for me, from T-3 hours to the finish.",
+        "",
+        "I want:",
+        "- A timeline with exact times, quantities and actions",
+        "- What to lay out the night before",
+        "- A short 'if things go wrong' section at the bottom",
+        "- Formatted so it prints on one page"
+      ]
+    };
+    return intros[s.goal].join("\n") + "\n\n" + this.profileBlock() +
+      "\n\nBe specific and honest. Name real products and real prices where relevant. If something in my profile is a bad idea, say so.";
+  }
+
+  select(key, value) {
+    this.setState({ [key]: value, copied: false });
+  }
+
+  copyPrompt = () => {
+    const text = this.buildPrompt();
+    const done = () => {
+      this.setState({ copied: true });
+      clearTimeout(this._t);
+      this._t = setTimeout(() => this.setState({ copied: false }), 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => this.fallbackCopy(text, done));
+    } else {
+      this.fallbackCopy(text, done);
+    }
+  };
+
+  fallbackCopy(text, done) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+
+  chipStyle(active) {
+    return {
+      padding: "9px 16px",
+      borderRadius: "999px",
+      border: active ? "1px solid #b85832" : "1px solid #ddd6c4",
+      background: active ? "#b85832" : "#ffffff",
+      color: active ? "#fdfaf3" : "#15201d",
+      fontFamily: "Inter, sans-serif",
+      fontWeight: 600,
+      fontSize: "13.5px",
+      cursor: "pointer",
+      transition: "background 160ms ease, border-color 160ms ease, color 160ms ease"
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const prompt = this.buildPrompt();
+
+    const goalCards = this.goals.map((g) => {
+      const selected = s.goal === g.id;
+      return {
+        ...g,
+        selected,
+        onSelect: () => this.select("goal", g.id),
+        cardStyle: {
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+          textAlign: "left",
+          padding: "16px 18px",
+          borderRadius: "14px",
+          border: selected ? "1.5px solid #b85832" : "1px solid #ddd6c4",
+          background: selected ? "#f5f0e6" : "#ffffff",
+          boxShadow: selected ? "0 6px 18px rgba(21,32,29,0.10)" : "0 2px 8px rgba(21,32,29,0.05)",
+          cursor: "pointer",
+          transition: "border-color 160ms ease, box-shadow 160ms ease, background 160ms ease"
+        },
+        dotStyle: {
+          flex: "none",
+          width: "16px",
+          height: "16px",
+          marginTop: "1px",
+          borderRadius: "999px",
+          border: selected ? "5px solid #b85832" : "1.5px solid #cdc4ad",
+          background: "#ffffff",
+          boxSizing: "border-box",
+          transition: "border 160ms ease"
+        }
+      };
+    });
+
+    const eventChips = this.events.map((ev) => ({
+      ...ev,
+      selected: s.event === ev.id,
+      chipStyle: this.chipStyle(s.event === ev.id),
+      onSelect: () => {
+        const next = { event: ev.id, copied: false };
+        if (ev.duration) next.duration = ev.duration;
+        this.setState(next);
+      }
+    }));
+
+    const num = (key) => (e) => {
+      const v = parseInt(e.target.value, 10);
+      this.select(key, isNaN(v) ? "" : v);
+    };
+
+    return {
+      ...s,
+      goalCards,
+      eventChips,
+      promptText: prompt,
+      weightUnitLabel: this.props.weightUnit ?? "kg",
+      wordCount: prompt.trim().split(/\s+/).length,
+      copyLabel: s.copied ? "Copied — paste it into your AI" : "Copy prompt",
+      showCountryHint: s.goal === "find" && !s.country.trim(),
+      setDuration: num("duration"),
+      setBodyweight: num("bodyweight"),
+      setCarbs: num("carbs"),
+      setSweat: (e) => this.select("sweat", e.target.value),
+      setCountry: (e) => this.select("country", e.target.value),
+      setBudget: (e) => this.select("budget", e.target.value),
+      setDiy: (e) => this.select("diy", e.target.value),
+      setCarrier: (e) => this.select("carrier", e.target.value),
+      toggleStomach: () => this.select("sensitiveStomach", !s.sensitiveStomach),
+      toggleCaffeine: () => this.select("caffeine", !s.caffeine),
+      stomachChipStyle: this.chipStyle(s.sensitiveStomach),
+      caffeineChipStyle: this.chipStyle(s.caffeine)
+    };
+  }
+}
+</script>
+</body>
+</html>

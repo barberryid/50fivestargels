@@ -1,13 +1,9 @@
 // AI Race Fuel Prompt Generator — second React island (brief §8).
-// Questionnaire → six prompt templates → copy to clipboard.
-// All prompt text is assembled in src/lib/promptBuilder.ts.
+// Questionnaire (goal → event/profile → preferences) with a sticky prompt
+// panel that updates live, per design_handoff_prompt_creator/. All prompt
+// text is assembled in src/lib/promptBuilder.ts.
 import { useMemo, useState } from 'react';
-import {
-  SPORT_PRESETS,
-  defaultCarbsPerHour,
-  type SportKey,
-  type SweatLevel,
-} from '../../data/defaults';
+import { SPORT_PRESETS, defaultCarbsPerHour, type SweatLevel } from '../../data/defaults';
 import {
   PROMPT_TYPES,
   buildPrompt,
@@ -18,14 +14,24 @@ import {
   type PromptType,
 } from '../../lib/promptBuilder';
 
-const labelCls = 'block font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-text-muted mb-1';
-const inputCls =
-  'w-full rounded-lg border border-border bg-white px-3 py-2 font-sans text-sm text-text';
+const stepEyebrowCls = 'font-sans text-[12px] font-extrabold uppercase tracking-[0.18em] text-accent';
+const stepHelperCls = 'font-body text-[15px] text-text-muted';
+const fieldLabelCls = 'font-sans text-[11px] font-extrabold uppercase tracking-[0.14em] text-text-muted';
+const fieldInputCls =
+  'w-full rounded-[10px] border border-border bg-white px-3.5 py-[11px] font-body text-[16px] text-text';
+
 const chipCls = (active: boolean) =>
-  `rounded-full border px-3.5 py-2 font-sans text-[13px] font-bold transition-colors ${
+  `rounded-full border px-4 py-[9px] font-sans text-[13.5px] font-semibold transition-colors duration-150 ${
     active
-      ? 'border-accent bg-accent text-white'
-      : 'border-border bg-white text-text-muted hover:border-accent-deep hover:text-text'
+      ? 'border-accent bg-accent text-bg'
+      : 'border-border bg-white text-text hover:border-accent'
+  }`;
+
+const goalCardCls = (selected: boolean) =>
+  `flex flex-col gap-2 rounded-[14px] border p-4 text-left shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition-all duration-150 ${
+    selected
+      ? 'border-[1.5px] border-accent bg-bg-soft shadow-[0_6px_18px_rgba(0,0,0,0.10)]'
+      : 'border-border bg-white hover:border-accent-deep'
   }`;
 
 const INITIAL: PromptAnswers = {
@@ -42,238 +48,302 @@ const INITIAL: PromptAnswers = {
   container: 'bottles',
 };
 
+function fallbackCopy(text: string) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } catch {
+    /* clipboard unavailable — user can select the text manually */
+  }
+  document.body.removeChild(ta);
+}
+
 export default function PromptGenerator() {
   const [answers, setAnswers] = useState<PromptAnswers>(INITIAL);
   const [type, setType] = useState<PromptType>('find-gels');
   const [copied, setCopied] = useState(false);
-  const patch = (p: Partial<PromptAnswers>) => setAnswers((a) => ({ ...a, ...p }));
+  const patch = (p: Partial<PromptAnswers>) => {
+    setAnswers((a) => ({ ...a, ...p }));
+    setCopied(false);
+  };
 
   const prompt = useMemo(() => buildPrompt(type, answers), [type, answers]);
+  const wordCount = useMemo(() => prompt.trim().split(/\s+/).length, [prompt]);
 
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(prompt);
+  const copy = () => {
+    const done = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable — user can select the text manually */
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(prompt).then(done).catch(() => {
+        fallbackCopy(prompt);
+        done();
+      });
+    } else {
+      fallbackCopy(prompt);
+      done();
     }
   };
 
+  const showCountryHint = type === 'find-gels' && !answers.country.trim();
+
   return (
-    <div className="fuel-card mt-8 p-5 sm:p-7">
-      {/* Step 1: prompt type */}
-      <p className={labelCls}>1 · What do you want your AI to do?</p>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="tablist" aria-label="Prompt type">
-        {(Object.keys(PROMPT_TYPES) as PromptType[]).map((key) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={type === key}
-            onClick={() => setType(key)}
-            className={`rounded-lg border p-3 text-left transition-colors ${
-              type === key
-                ? 'border-accent bg-accent text-white'
-                : 'border-border bg-white hover:border-accent-deep'
-            }`}
-          >
-            <span className={`block font-sans text-[13px] font-extrabold ${type === key ? '' : 'text-text'}`}>
-              {PROMPT_TYPES[key].label}
-            </span>
-            <span
-              className={`mt-1 block font-sans text-[11.5px] leading-snug ${
-                type === key ? 'opacity-90' : 'text-text-muted'
-              }`}
+    <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
+      {/* LEFT: the form */}
+      <div className="flex min-w-0 flex-col gap-11">
+        {/* Step 1 */}
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2.5 border-b border-border pb-3">
+            <p className={stepEyebrowCls}>Step 1 · What should the AI do?</p>
+            <p className={stepHelperCls}>Pick one task. The prompt is rebuilt around it.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" role="tablist" aria-label="Prompt type">
+            {(Object.keys(PROMPT_TYPES) as PromptType[]).map((key) => {
+              const selected = type === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setType(key);
+                    setCopied(false);
+                  }}
+                  className={goalCardCls(selected)}
+                >
+                  <span className="flex items-start justify-between gap-2.5">
+                    <span className="font-sans text-[15px] font-bold leading-tight text-text">
+                      {PROMPT_TYPES[key].label}
+                    </span>
+                    <span
+                      className={`mt-[1px] box-border block h-4 w-4 flex-none rounded-full bg-white transition-[border] duration-150 ${
+                        selected ? 'border-[5px] border-accent' : 'border-[1.5px] border-border-strong'
+                      }`}
+                    />
+                  </span>
+                  <span className="font-body text-[14px] leading-snug text-text-muted">
+                    {PROMPT_TYPES[key].blurb}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Step 2 */}
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2.5 border-b border-border pb-3">
+            <p className={stepEyebrowCls}>Step 2 · You and your event</p>
+            <p className={stepHelperCls}>Picking an event fills in a sensible duration — adjust anything.</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(SPORT_PRESETS) as Array<keyof typeof SPORT_PRESETS>).map((key) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={answers.sport === key}
+                className={chipCls(answers.sport === key)}
+                onClick={() =>
+                  patch({
+                    sport: key,
+                    durationMin: SPORT_PRESETS[key].durationMin,
+                    carbsPerHour: defaultCarbsPerHour(SPORT_PRESETS[key].durationMin),
+                  })
+                }
+              >
+                {SPORT_PRESETS[key].label}
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-pressed={answers.sport === 'custom'}
+              className={chipCls(answers.sport === 'custom')}
+              onClick={() => patch({ sport: 'custom' })}
             >
-              {PROMPT_TYPES[key].blurb}
-            </span>
-          </button>
-        ))}
+              Custom
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Expected duration</span>
+              <span className="relative block">
+                <input
+                  type="number"
+                  min="20"
+                  max="1440"
+                  className={`${fieldInputCls} pr-12`}
+                  value={answers.durationMin}
+                  onChange={(e) => {
+                    const durationMin = Math.max(20, Number(e.target.value) || 20);
+                    patch({ sport: 'custom', durationMin, carbsPerHour: defaultCarbsPerHour(durationMin) });
+                  }}
+                />
+                <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
+                  min
+                </span>
+              </span>
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Bodyweight</span>
+              <span className="relative block">
+                <input
+                  type="number"
+                  min="30"
+                  max="200"
+                  className={`${fieldInputCls} pr-12`}
+                  value={answers.weightKg}
+                  onChange={(e) => patch({ weightKg: Math.max(30, Number(e.target.value) || 30) })}
+                />
+                <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
+                  kg
+                </span>
+              </span>
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Target carbs</span>
+              <span className="relative block">
+                <input
+                  type="number"
+                  min="10"
+                  max="150"
+                  step={5}
+                  className={`${fieldInputCls} pr-12`}
+                  value={answers.carbsPerHour}
+                  onChange={(e) => patch({ carbsPerHour: Math.max(10, Number(e.target.value) || 10) })}
+                />
+                <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
+                  g/h
+                </span>
+              </span>
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Sweat level</span>
+              <select
+                className={fieldInputCls}
+                value={answers.sweat}
+                onChange={(e) => patch({ sweat: e.target.value as SweatLevel })}
+              >
+                <option value="low">Low — barely salty</option>
+                <option value="medium">Medium</option>
+                <option value="high">High — salt-crusted kit</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        {/* Step 3 */}
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2.5 border-b border-border pb-3">
+            <p className={stepEyebrowCls}>Step 3 · Your preferences</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Country</span>
+              <input
+                type="text"
+                placeholder="e.g. Ireland"
+                className={fieldInputCls}
+                value={answers.country}
+                onChange={(e) => patch({ country: e.target.value })}
+              />
+              {showCountryHint && (
+                <span className="font-body text-[13px] text-accent">
+                  Needed for local availability and prices — the AI can only rank what you can buy.
+                </span>
+              )}
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Budget</span>
+              <select
+                className={fieldInputCls}
+                value={answers.budget}
+                onChange={(e) => patch({ budget: e.target.value as Budget })}
+              >
+                <option value="value">Budget-focused</option>
+                <option value="mid">Balanced</option>
+                <option value="premium">Price is no object</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Commercial vs DIY</span>
+              <select
+                className={fieldInputCls}
+                value={answers.preference}
+                onChange={(e) => patch({ preference: e.target.value as Preference })}
+              >
+                <option value="both">Open to both</option>
+                <option value="commercial">Commercial products only</option>
+                <option value="diy">DIY / homemade only</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-[7px]">
+              <span className={fieldLabelCls}>Fuel carrier</span>
+              <select
+                className={fieldInputCls}
+                value={answers.container}
+                onChange={(e) => patch({ container: e.target.value as Container })}
+              >
+                <option value="bottles">Bottles (drink mix)</option>
+                <option value="gels">Gels in pockets / belt</option>
+                <option value="vest">Hydration vest</option>
+                <option value="course">Whatever the course hands out</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              aria-pressed={answers.sensitiveStomach}
+              className={chipCls(answers.sensitiveStomach)}
+              onClick={() => patch({ sensitiveStomach: !answers.sensitiveStomach })}
+            >
+              Sensitive stomach
+            </button>
+            <button
+              type="button"
+              aria-pressed={answers.usesCaffeine}
+              className={chipCls(answers.usesCaffeine)}
+              onClick={() => patch({ usesCaffeine: !answers.usesCaffeine })}
+            >
+              I use caffeine
+            </button>
+          </div>
+        </section>
       </div>
 
-      {/* Step 2: questionnaire */}
-      <p className={`${labelCls} mt-6`}>2 · About you and your event</p>
-      <div className="mb-3 flex flex-wrap gap-2">
-        {(Object.keys(SPORT_PRESETS) as Array<keyof typeof SPORT_PRESETS>).map((key) => (
-          <button
-            key={key}
-            type="button"
-            className={chipCls(answers.sport === key)}
-            onClick={() =>
-              patch({
-                sport: key,
-                durationMin: SPORT_PRESETS[key].durationMin,
-                carbsPerHour: defaultCarbsPerHour(SPORT_PRESETS[key].durationMin),
-              })
-            }
-          >
-            {SPORT_PRESETS[key].label}
-          </button>
-        ))}
-        <button type="button" className={chipCls(answers.sport === 'custom')} onClick={() => patch({ sport: 'custom' })}>
-          Custom
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div>
-          <label className={labelCls} htmlFor="pg-duration">
-            Expected duration (min)
-          </label>
-          <input
-            id="pg-duration"
-            type="number"
-            min="20"
-            max="1440"
-            className={inputCls}
-            value={answers.durationMin}
-            onChange={(e) => {
-              const durationMin = Math.max(20, Number(e.target.value) || 20);
-              patch({ sport: 'custom', durationMin, carbsPerHour: defaultCarbsPerHour(durationMin) });
-            }}
-          />
+      {/* RIGHT: sticky prompt panel */}
+      <aside className="overflow-hidden rounded-2xl border border-border bg-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] lg:sticky lg:top-6">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-[18px]">
+          <p className="font-sans text-[12px] font-extrabold uppercase tracking-[0.18em] text-accent">Your prompt</p>
+          <div className="flex items-center gap-1.5 font-sans text-[12px] font-semibold text-green">
+            <span className="inline-block h-[7px] w-[7px] rounded-full bg-green" />
+            Updates live
+          </div>
         </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-weight">
-            Bodyweight (kg)
-          </label>
-          <input
-            id="pg-weight"
-            type="number"
-            min="30"
-            max="200"
-            className={inputCls}
-            value={answers.weightKg}
-            onChange={(e) => patch({ weightKg: Math.max(30, Number(e.target.value) || 30) })}
-          />
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-carbs">
-            Target carbs g/hour
-          </label>
-          <input
-            id="pg-carbs"
-            type="number"
-            min="10"
-            max="150"
-            className={inputCls}
-            value={answers.carbsPerHour}
-            onChange={(e) => patch({ carbsPerHour: Math.max(10, Number(e.target.value) || 10) })}
-          />
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-sweat">
-            Sweat level
-          </label>
-          <select
-            id="pg-sweat"
-            className={inputCls}
-            value={answers.sweat}
-            onChange={(e) => patch({ sweat: e.target.value as SweatLevel })}
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High / hot venue</option>
-          </select>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-country">
-            Country
-          </label>
-          <input
-            id="pg-country"
-            type="text"
-            placeholder="e.g. Ireland"
-            className={inputCls}
-            value={answers.country}
-            onChange={(e) => patch({ country: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-budget">
-            Budget
-          </label>
-          <select
-            id="pg-budget"
-            className={inputCls}
-            value={answers.budget}
-            onChange={(e) => patch({ budget: e.target.value as Budget })}
-          >
-            <option value="value">Budget-focused</option>
-            <option value="mid">Balanced</option>
-            <option value="premium">Premium okay</option>
-          </select>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-pref">
-            Commercial vs DIY
-          </label>
-          <select
-            id="pg-pref"
-            className={inputCls}
-            value={answers.preference}
-            onChange={(e) => patch({ preference: e.target.value as Preference })}
-          >
-            <option value="both">Open to both</option>
-            <option value="commercial">Prefer commercial</option>
-            <option value="diy">Prefer DIY</option>
-          </select>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="pg-container">
-            Fuel carrier
-          </label>
-          <select
-            id="pg-container"
-            className={inputCls}
-            value={answers.container}
-            onChange={(e) => patch({ container: e.target.value as Container })}
-          >
-            <option value="bottles">Bottles (drink mix)</option>
-            <option value="soft-flasks">Soft flasks (syrup)</option>
-            <option value="gels-only">Gels only</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-        <label className="flex cursor-pointer items-center gap-2 font-sans text-[13px] font-bold text-text">
-          <input
-            type="checkbox"
-            checked={answers.sensitiveStomach}
-            onChange={(e) => patch({ sensitiveStomach: e.target.checked })}
-          />
-          Sensitive stomach
-        </label>
-        <label className="flex cursor-pointer items-center gap-2 font-sans text-[13px] font-bold text-text">
-          <input
-            type="checkbox"
-            checked={answers.usesCaffeine}
-            onChange={(e) => patch({ usesCaffeine: e.target.checked })}
-          />
-          I use caffeine
-        </label>
-      </div>
-
-      {/* Step 3: generated prompt */}
-      <p className={`${labelCls} mt-6`}>3 · Your prompt — copy it into Claude, ChatGPT or any AI assistant</p>
-      <div className="rounded-lg border border-border bg-paper-warm p-4">
-        <pre className="m-0 max-h-96 overflow-auto whitespace-pre-wrap font-mono text-[12.5px] leading-relaxed text-text">
+        <pre className="m-0 max-h-[56vh] overflow-y-auto whitespace-pre-wrap break-words bg-bg-soft p-5 font-mono text-[12.5px] leading-relaxed text-text">
           {prompt}
         </pre>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-4">
-        <button type="button" onClick={copy} className="fuel-btn fuel-btn-accent border-0 text-[14px]">
-          {copied ? 'Prompt copied ✓' : 'Copy prompt'}
-        </button>
-        <p className="m-0 font-sans text-[12px] text-text-muted">
-          The prompt updates live as you change your answers above.
-        </p>
-      </div>
-      <p className="mb-0 mt-4 font-sans text-[12px] leading-relaxed text-text-muted">
-        Whatever your AI suggests is a starting point to test in training — never race on something new.
-      </p>
+        <div className="flex flex-col gap-2.5 border-t border-border px-5 py-[18px]">
+          <button type="button" onClick={copy} className="fuel-btn fuel-btn-accent w-full border-0 text-[14px]">
+            {copied ? 'Copied — paste it into your AI' : 'Copy prompt'}
+          </button>
+          <p className="m-0 text-center font-body text-[13px] leading-relaxed text-text-muted">
+            {wordCount} words · paste into Claude, ChatGPT or any assistant
+          </p>
+        </div>
+      </aside>
     </div>
   );
 }
