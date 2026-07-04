@@ -18,3 +18,6 @@ node_modules/
 
 # Microsoft Office temporary owner files
 ~$*
+
+# local working copy of the reference sheet
+50FiveStarGels.docx
