@@ -35,67 +35,7 @@ const fuelingLinks = [
   jsonLd={[websiteJsonLd(), publisherJsonLd()]}
   chrome={false}
 >
-  <Fragment slot="head-extra">
-    <style>
-      .gate-skip #entry-gate {
-        display: none !important;
-      }
-    </style>
-  </Fragment>
-
-  <script is:inline>
-    if (sessionStorage.getItem('gels-gate-entered') === '1') {
-      document.documentElement.classList.add('gate-skip');
-    }
-  </script>
-
   <div style="font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);min-height:100vh;overflow-x:hidden;">
-    <!-- ======================= ENTRY GATE ======================= -->
-    <div
-      id="entry-gate"
-      style="position:fixed;inset:0;z-index:60;background:var(--color-bg);overflow:hidden;transition:transform 700ms cubic-bezier(0.65,0,0.35,1);will-change:transform;"
-    >
-      <div style="position:absolute;top:24px;left:32px;display:flex;align-items:center;gap:12px;">
-        <img src="/images/logo-star.svg" alt="" width="34" height="34" />
-        <span style="font-family:var(--font-serif);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">50Five<br />Star<br />Gels</span>
-      </div>
-
-      <div style="position:absolute;top:48%;left:2vw;transform:translateY(-58%);z-index:3;pointer-events:none;font-family:var(--font-serif);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">Bounce<br />the gel</div>
-      <div style="position:absolute;top:54%;right:2vw;transform:translateY(-38%);z-index:3;pointer-events:none;text-align:right;font-family:var(--font-serif);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">to get<br />in!</div>
-
-      <div id="gate-gel" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);cursor:pointer;display:flex;flex-direction:column;align-items:center;user-select:none;-webkit-tap-highlight-color:transparent;z-index:2;">
-        <div id="gate-gel-anim" class="gel-bounce-target">
-          <svg width="min(28vw, 42vh, 300px)" height="auto" viewBox="0 0 240 360" aria-label="Energy gel packet">
-            <path d="M74 10 L166 10 L174 40 L66 40 Z" fill="#E33529"></path>
-            <path d="M64 36 L176 36 L178 48 L62 48 Z" fill="#000000"></path>
-            <path d="M172 22 C186 26 196 40 192 52 C190 60 182 62 178 56" fill="none" stroke="#E33529" stroke-width="7" stroke-linecap="round"></path>
-            <circle cx="196" cy="66" r="7" fill="#E33529"></circle>
-            <circle cx="208" cy="86" r="4.5" fill="#E33529"></circle>
-            <path d="M58 54 C58 50 62 46 68 46 L172 46 C178 46 182 50 182 54 L196 240 C202 300 166 344 120 344 C74 344 38 300 44 240 Z" fill="#F6F6ED" stroke="#000000" stroke-width="4"></path>
-            <path d="M76 66 C70 110 66 180 74 250 C80 296 92 316 100 322" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.85"></path>
-            <path d="M166 70 C172 120 176 190 168 254" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.6"></path>
-            <path d="M96 60 C94 84 92 110 92 136" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.35"></path>
-            <g transform="translate(120, 168)">
-              <path d="M0 -52 L15.2 -16.4 L52 -16.4 L22.8 6.8 L34 44 L0 22 L-34 44 L-22.8 6.8 L-52 -16.4 L-15.2 -16.4 Z" fill="#E33529" stroke="#000000" stroke-width="4" stroke-linejoin="round"></path>
-              <text x="0" y="104" text-anchor="middle" font-family="Bayon, sans-serif" font-size="64" fill="#E33529">50</text>
-            </g>
-          </svg>
-        </div>
-        <div class="gel-shadow" style="width:150px;height:20px;border-radius:50%;background:#000000;opacity:0.22;filter:blur(8px);margin-top:8px;"></div>
-      </div>
-
-      <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);text-align:center;z-index:3;">
-        <div id="gate-counter" style="font-family:var(--font-serif);font-size:26px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">5 bounces to get in</div>
-        <div id="gate-quip" style="font-family:var(--font-body);font-size:14px;font-weight:500;color:#000000;opacity:0.6;margin-top:6px;min-height:20px;">It wants to be bounced. They all do.</div>
-        <a
-          id="gate-skip"
-          href="#top"
-          style="display:inline-block;margin-top:12px;font-family:var(--font-body);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--color-green);text-decoration:underline;text-underline-offset:3px;cursor:pointer;"
-          >In a hurry? Skip the warm-up →</a
-        >
-      </div>
-    </div>
-
     <!-- ======================= HERO ======================= -->
     <section id="top" style="position:relative;min-height:100vh;overflow:hidden;background:var(--color-bg);">
       <header style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;padding:24px 32px;gap:24px;">
@@ -214,9 +154,6 @@ const fuelingLinks = [
     .gel-pill-btn:hover {
       background: #000 !important;
     }
-    #gate-skip:hover {
-      color: #000 !important;
-    }
     .gel-cta-btn:hover {
       background: #000 !important;
       transform: translateY(-2px);
@@ -235,28 +172,8 @@ const fuelingLinks = [
   </style>
 
   <script>
-    const GATE_KEY = 'gels-gate-entered';
-    const NEEDED = 5;
-    const QUIPS = [
-      'It wants to be bounced. They all do.',
-      "That's one. Carbs loading…",
-      'Good pop. Isotonic, even.',
-      'Your glycogen stores thank you.',
-      "One more and you're through the tape.",
-    ];
-
-    const gate = document.getElementById('entry-gate');
-    const gateGel = document.getElementById('gate-gel');
-    const gateGelAnim = document.getElementById('gate-gel-anim');
-    const counterEl = document.getElementById('gate-counter');
-    const quipEl = document.getElementById('gate-quip');
-    const skipLink = document.getElementById('gate-skip');
     const heroGel = document.getElementById('hero-gel');
     const heroGelAnim = document.getElementById('hero-gel-anim');
-
-    let bounces = 0;
-    let entered = false;
-    let popToggle = false;
 
     function popClass(toggle: boolean) {
       return toggle ? 'is-popping-a' : 'is-popping-b';
@@ -264,53 +181,6 @@ const fuelingLinks = [
 
     function settle(target: HTMLElement) {
       target.classList.remove('is-popping-a', 'is-popping-b');
-    }
-
-    function updateCounter() {
-      const left = Math.max(0, NEEDED - bounces);
-      counterEl!.textContent = left === NEEDED ? `${NEEDED} bounces to get in` : `${left} to go`;
-      quipEl!.textContent = QUIPS[Math.min(bounces, QUIPS.length - 1)];
-    }
-
-    function enterSite() {
-      if (entered) return;
-      entered = true;
-      counterEl!.textContent = 'Fuelled. In you go.';
-      (counterEl as HTMLElement).style.color = 'var(--color-green)';
-      quipEl!.textContent = '';
-      (gate as HTMLElement).style.transform = 'translateY(-100%)';
-      sessionStorage.setItem(GATE_KEY, '1');
-      setTimeout(() => {
-        (gate as HTMLElement).style.display = 'none';
-      }, 700);
-    }
-
-    if (gate && sessionStorage.getItem(GATE_KEY) === '1') {
-      (gate as HTMLElement).style.display = 'none';
-      entered = true;
-    }
-
-    if (gateGel && gateGelAnim) {
-      gateGel.addEventListener('click', () => {
-        if (entered) return;
-        bounces += 1;
-        popToggle = !popToggle;
-        settle(gateGelAnim as HTMLElement);
-        void (gateGelAnim as HTMLElement).offsetWidth;
-        gateGelAnim.classList.add(popClass(popToggle));
-        updateCounter();
-        if (bounces >= NEEDED) {
-          setTimeout(enterSite, 650);
-        }
-      });
-      gateGelAnim.addEventListener('animationend', () => settle(gateGelAnim as HTMLElement));
-    }
-
-    if (skipLink) {
-      skipLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        enterSite();
-      });
     }
 
     if (heroGel && heroGelAnim) {
