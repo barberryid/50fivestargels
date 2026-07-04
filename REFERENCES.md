@@ -21,7 +21,8 @@ them in as each piece of account-level setup is completed.
 
 ## Websites
 
-- Production domain: [TODO: not chosen/connected yet]
+- Primary / canonical / root: https://50fivestargels.com (live since 2026-07-04)
+- Secondary / redirecting version: https://www.50fivestargels.com
 - Cloudflare Pages URL: https://50fivestargels.pages.dev (live since 2026-07-02)
 - GitHub repo: https://github.com/barberryid/50fivestargels
 - Sister site (conventions source): https://50fivestarhotels.com
@@ -84,7 +85,7 @@ Mirroring the hotels project's convention — none created yet:
 - Build command: `npm run build`
 - Build output directory: `dist`
 - Root directory: `/`
-- Custom domain: [TODO: add under the Pages project once a domain is chosen]
+- Custom domain: 50fivestargels.com (connected 2026-07-04; www redirects to root)
 
 ## Project brief
 

@@ -1,5 +1,5 @@
-// Live: https://50fivestargels.pages.dev - TODO: switch SITE_URL to a custom domain when one is connected.
-export const SITE_URL = 'https://50fivestargels.pages.dev';
+// Canonical domain, live since 2026-07-04 (https://50fivestargels.pages.dev remains as the Pages URL).
+export const SITE_URL = 'https://50fivestargels.com';
 export const siteName = '50FiveStarGels';
 export const defaultDescription =
   'Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training.';

@@ -3,11 +3,9 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 
-// Live on Cloudflare Pages since 2026-07-02.
-// TODO: replace `site` with the custom domain once one is chosen and
-// connected in the Pages project.
+// Live on Cloudflare Pages since 2026-07-02; custom domain since 2026-07-04.
 export default defineConfig({
-  site: 'https://50fivestargels.pages.dev',
+  site: 'https://50fivestargels.com',
   output: 'static',
   integrations: [react(), sitemap()],
   vite: {
