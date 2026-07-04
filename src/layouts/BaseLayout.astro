@@ -13,9 +13,11 @@ interface Props {
   noindex?: boolean;
   jsonLd?: Record<string, any> | Record<string, any>[];
   imageAlt?: string;
+  /** Set false to skip the shared Header/Footer chrome (page supplies its own). */
+  chrome?: boolean;
 }
 
-const { title, description, canonical, image, type, noindex, jsonLd, imageAlt } = Astro.props;
+const { title, description, canonical, image, type, noindex, jsonLd, imageAlt, chrome = true } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -33,10 +35,11 @@ const { title, description, canonical, image, type, noindex, jsonLd, imageAlt } 
       jsonLd={jsonLd}
       imageAlt={imageAlt}
     />
+    <slot name="head-extra" />
   </head>
   <body>
-    <Header />
+    {chrome && <Header />}
     <slot />
-    <Footer />
+    {chrome && <Footer />}
   </body>
 </html>

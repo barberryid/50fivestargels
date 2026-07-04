@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bayon&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #F3F3E9; }
+    @keyframes gel-idle {
+      0%, 100% { transform: translateY(0) scale(1, 1) rotate(-1deg); }
+      50% { transform: translateY(-16px) scale(0.995, 1.005) rotate(1deg); }
+    }
+    @keyframes gel-pop-a {
+      0%   { transform: translateY(0) scale(1.14, 0.8) rotate(0deg); }
+      12%  { transform: translateY(-10px) scale(0.92, 1.1) rotate(-3deg); }
+      45%  { transform: translateY(-140px) scale(0.96, 1.05) rotate(-7deg); }
+      78%  { transform: translateY(0) scale(1, 1) rotate(0deg); }
+      88%  { transform: translateY(0) scale(1.1, 0.88) rotate(2deg); }
+      100% { transform: translateY(0) scale(1, 1) rotate(-1deg); }
+    }
+    @keyframes gel-pop-b {
+      0%   { transform: translateY(0) scale(1.14, 0.8) rotate(0deg); }
+      12%  { transform: translateY(-10px) scale(0.92, 1.1) rotate(3deg); }
+      45%  { transform: translateY(-140px) scale(0.96, 1.05) rotate(7deg); }
+      78%  { transform: translateY(0) scale(1, 1) rotate(0deg); }
+      88%  { transform: translateY(0) scale(1.1, 0.88) rotate(-2deg); }
+      100% { transform: translateY(0) scale(1, 1) rotate(-1deg); }
+    }
+    @keyframes shadow-idle {
+      0%, 100% { transform: scaleX(1); opacity: 0.25; }
+      50% { transform: scaleX(0.9); opacity: 0.16; }
+    }
+  </style>
+</helmet>
+
+<div style="font-family: 'Inter', sans-serif; background: #F3F3E9; color: #000000; min-height: 100vh; overflow-x: hidden;">
+
+  <!-- ======================= ENTRY GATE ======================= -->
+  <sc-if value="{{ gateMounted }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Entry gate" style="position: fixed; inset: 0; z-index: 60; background: #F3F3E9; overflow: hidden; transition: transform 700ms cubic-bezier(0.65, 0, 0.35, 1); transform: {{ gateTransform }}; will-change: transform;">
+
+      <div style="position: absolute; top: 24px; left: 32px; display: flex; align-items: center; gap: 12px;">
+        <img src="assets/logo-star.svg" alt="" width="34" height="34">
+        <span style="font-family: 'Bayon', sans-serif; font-size: 17px; line-height: 0.95; letter-spacing: -0.01em; text-transform: uppercase; color: #E33529;">50Five<br>Star<br>Gels</span>
+      </div>
+
+      <!-- giant split headline -->
+      <div style="position: absolute; top: 48%; left: 2vw; transform: translateY(-58%); z-index: 3; pointer-events: none; font-family: 'Bayon', sans-serif; font-size: clamp(72px, 14.5vw, 270px); line-height: 0.78; text-transform: uppercase; color: #E33529; letter-spacing: -0.02em; white-space: nowrap;">Bounce<br>the gel</div>
+      <div style="position: absolute; top: 54%; right: 2vw; transform: translateY(-38%); z-index: 3; pointer-events: none; text-align: right; font-family: 'Bayon', sans-serif; font-size: clamp(72px, 14.5vw, 270px); line-height: 0.78; text-transform: uppercase; color: #E33529; letter-spacing: -0.02em; white-space: nowrap;">to get<br>in!</div>
+
+      <!-- central gel -->
+      <div onClick="{{ bounceGel }}" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -52%); cursor: pointer; display: flex; flex-direction: column; align-items: center; user-select: none; -webkit-tap-highlight-color: transparent; z-index: 2;">
+        <div onAnimationEnd="{{ gelSettled }}" style="animation: {{ gelAnim }}; transform-origin: 50% 100%;">
+          <svg width="min(28vw, 42vh, 300px)" height="auto" viewBox="0 0 240 360" aria-label="Energy gel packet">
+            <path d="M74 10 L166 10 L174 40 L66 40 Z" fill="#E33529"></path>
+            <path d="M64 36 L176 36 L178 48 L62 48 Z" fill="#000000"></path>
+            <path d="M172 22 C186 26 196 40 192 52 C190 60 182 62 178 56" fill="none" stroke="#E33529" stroke-width="7" stroke-linecap="round"></path>
+            <circle cx="196" cy="66" r="7" fill="#E33529"></circle>
+            <circle cx="208" cy="86" r="4.5" fill="#E33529"></circle>
+            <path d="M58 54 C58 50 62 46 68 46 L172 46 C178 46 182 50 182 54 L196 240 C202 300 166 344 120 344 C74 344 38 300 44 240 Z" fill="#F6F6ED" stroke="#000000" stroke-width="4"></path>
+            <path d="M76 66 C70 110 66 180 74 250 C80 296 92 316 100 322" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.85"></path>
+            <path d="M166 70 C172 120 176 190 168 254" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.6"></path>
+            <path d="M96 60 C94 84 92 110 92 136" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" opacity="0.35"></path>
+            <g transform="translate(120, 168)">
+              <path d="M0 -52 L15.2 -16.4 L52 -16.4 L22.8 6.8 L34 44 L0 22 L-34 44 L-22.8 6.8 L-52 -16.4 L-15.2 -16.4 Z" fill="#E33529" stroke="#000000" stroke-width="4" stroke-linejoin="round"></path>
+              <text x="0" y="104" text-anchor="middle" font-family="Bayon, sans-serif" font-size="64" fill="#E33529">50</text>
+            </g>
+          </svg>
+        </div>
+        <div style="width: 150px; height: 20px; border-radius: 50%; background: #000000; opacity: 0.22; filter: blur(8px); margin-top: 8px; animation: shadow-idle 1.7s ease-in-out infinite;"></div>
+      </div>
+
+      <!-- counter + skip -->
+      <div style="position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); text-align: center; z-index: 3;">
+        <div style="font-family: 'Bayon', sans-serif; font-size: 26px; letter-spacing: -0.01em; text-transform: uppercase; color: {{ counterColor }};">{{ counterLine }}</div>
+        <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000000; opacity: 0.6; margin-top: 6px; min-height: 20px;">{{ quipLine }}</div>
+        <a onClick="{{ skipGate }}" style="display: inline-block; margin-top: 12px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #2B6786; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;" style-hover="color: #000000;">In a hurry? Skip the warm-up →</a>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ======================= HERO (full viewport, split headline) ======================= -->
+  <section id="top" data-screen-label="Hero" style="position: relative; min-height: 100vh; overflow: hidden; background: #F3F3E9;">
+
+    <!-- nav -->
+    <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 24px 32px; gap: 24px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="assets/logo-star.svg" alt="" width="34" height="34">
+        <span style="font-family: 'Bayon', sans-serif; font-size: 17px; line-height: 0.95; letter-spacing: -0.01em; text-transform: uppercase; color: #E33529;">50Five<br>Star<br>Gels</span>
+      </div>
+      <nav style="display: flex; align-items: center; gap: 36px; padding-top: 10px;">
+        <a href="#calculator" style="font-family: 'Bayon', sans-serif; font-size: 19px; letter-spacing: -0.01em; text-transform: uppercase; color: #E33529; text-decoration: none;" style-hover="color: #000000;">Calculator</a>
+        <a href="#what-you-get" style="font-family: 'Bayon', sans-serif; font-size: 19px; letter-spacing: -0.01em; text-transform: uppercase; color: #E33529; text-decoration: none;" style-hover="color: #000000;">What you get</a>
+        <a href="#coming-next" style="font-family: 'Bayon', sans-serif; font-size: 19px; letter-spacing: -0.01em; text-transform: uppercase; color: #E33529; text-decoration: none;" style-hover="color: #000000;">Coming next</a>
+      </nav>
+      <a href="https://50fivestargels.pages.dev/running-gel-cost-calculator/" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; background: #E33529; color: #F3F3E9; padding: 14px 26px; border-radius: 9999px; margin-top: 4px; text-decoration: none; transition: background 160ms ease;" style-hover="background: #000000;">Open calculator</a>
+    </header>
+
+    <!-- split headline -->
+    <div style="position: absolute; top: 48%; left: 2vw; transform: translateY(-55%); z-index: 3; pointer-events: none; font-family: 'Bayon', sans-serif; font-size: clamp(80px, 16vw, 300px); line-height: 0.78; text-transform: uppercase; color: #E33529; letter-spacing: -0.02em; white-space: nowrap;">The<br>right<br>gel</div>
+    <div style="position: absolute; top: 58%; right: 2vw; transform: translateY(-42%); z-index: 3; pointer-events: none; text-align: right; font-family: 'Bayon', sans-serif; font-size: clamp(80px, 16vw, 300px); line-height: 0.78; text-transform: uppercase; color: #E33529; letter-spacing: -0.02em; white-space: nowrap;">changes<br>the race!</div>
+
+    <!-- central trainers graphic -->
+    <div onClick="{{ heroPoke }}" title="Go on, bounce it" style="position: absolute; left: 50%; top: 54%; transform: translate(-50%, -50%); z-index: 2; cursor: pointer; display: flex; flex-direction: column; align-items: center; user-select: none; -webkit-tap-highlight-color: transparent;">
+      <div onAnimationEnd="{{ gelSettled }}" style="animation: {{ heroGelAnim }}; transform-origin: 50% 100%;">
+        <img src="assets/trainers.png" alt="Pair of racing trainers" style="width: min(46vw, 56vh, 580px); height: auto; display: block; mix-blend-mode: multiply;">
+      </div>
+      <div style="width: 340px; height: 24px; border-radius: 50%; background: #000000; opacity: 0.18; filter: blur(10px); margin-top: -10px;"></div>
+    </div>
+
+    <!-- bottom-left microcopy -->
+    <div style="position: absolute; left: 32px; bottom: 28px; z-index: 3; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: #000000; opacity: 0.65; text-transform: uppercase;">Free · no sign-up · results shareable by link</div>
+    <div style="position: absolute; right: 32px; bottom: 28px; z-index: 3; font-family: 'Bayon', sans-serif; font-size: 17px; letter-spacing: 0.02em; text-transform: uppercase; color: #2B6786;">Scroll ↓</div>
+  </section>
+
+  <!-- ======================= STATEMENT (blush pink) ======================= -->
+  <section data-screen-label="Statement" style="background: #F4CED3;">
+    <div style="max-width: 1100px; margin: 0 auto; padding: clamp(72px, 10vw, 140px) clamp(1rem, 4vw, 3rem); text-align: center;">
+      <div style="font-family: 'Bayon', sans-serif; font-size: clamp(38px, 5.2vw, 84px); line-height: 0.85; text-transform: uppercase; color: #E33529; letter-spacing: -0.02em;">Race fuel,<br>priced honestly.</div>
+    </div>
+  </section>
+
+  <!-- ======================= INTRO / CTA (teal) ======================= -->
+  <section id="calculator" data-screen-label="Intro" style="background: #2B6786;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 8vw, 110px) clamp(1rem, 4vw, 3rem); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 48px; align-items: center;">
+      <h2 style="font-family: 'Bayon', sans-serif; font-size: clamp(42px, 5vw, 80px); line-height: 0.82; text-transform: uppercase; color: #F3F3E9; margin: 0; letter-spacing: -0.02em;">Stop overpaying for race fuel.</h2>
+      <div>
+        <p style="font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 500; line-height: 1.65; color: #F3F3E9; margin: 0 0 28px;">Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training — with editable prices that work in any currency.</p>
+        <a href="https://50fivestargels.pages.dev/running-gel-cost-calculator/" style="display: inline-block; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; background: #E33529; color: #F3F3E9; padding: 18px 32px; border-radius: 9999px; text-decoration: none; transition: transform 160ms ease, background 160ms ease;" style-hover="background: #000000; transform: translateY(-2px);">Open the calculator →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= WHAT YOU GET (pastel cards) ======================= -->
+  <section id="what-you-get" data-screen-label="What you get" style="background: #F6F6ED;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(72px, 9vw, 130px) clamp(1rem, 4vw, 3rem);">
+      <h2 style="font-family: 'Bayon', sans-serif; font-size: clamp(56px, 9vw, 150px); line-height: 0.8; text-transform: uppercase; color: #E33529; margin: 0 0 clamp(36px, 5vw, 64px); letter-spacing: -0.02em;">What<br>you get</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+        <div style="background: #F4CED3; border-radius: 24px; padding: 40px 32px; transition: transform 180ms ease;" style-hover="transform: translateY(-6px);">
+          <div style="width: 52px; height: 52px; border-radius: 9999px; background: #E33529; color: #F3F3E9; display: flex; align-items: center; justify-content: center; font-family: 'Bayon', sans-serif; font-size: 24px; margin-bottom: 22px;">1</div>
+          <h3 style="font-family: 'Bayon', sans-serif; font-size: 34px; line-height: 0.85; text-transform: uppercase; letter-spacing: -0.01em; margin: 0 0 14px; color: #000000;">Money, made concrete</h3>
+          <p style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; line-height: 1.65; color: #000000; margin: 0;">Cost per gram of carbohydrate, plus what a 12-week training block really costs you in gels versus DIY mix.</p>
+        </div>
+        <div style="background: #EAD9EC; border-radius: 24px; padding: 40px 32px; transition: transform 180ms ease;" style-hover="transform: translateY(-6px);">
+          <div style="width: 52px; height: 52px; border-radius: 9999px; background: #E33529; color: #F3F3E9; display: flex; align-items: center; justify-content: center; font-family: 'Bayon', sans-serif; font-size: 24px; margin-bottom: 22px;">2</div>
+          <h3 style="font-family: 'Bayon', sans-serif; font-size: 34px; line-height: 0.85; text-transform: uppercase; letter-spacing: -0.01em; margin: 0 0 14px; color: #000000;">Buy, make — or both</h3>
+          <p style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; line-height: 1.65; color: #000000; margin: 0;">DIY mixes compared directly against commercial gels, instead of only spitting out a recipe.</p>
+        </div>
+        <div style="background: #AFD8FB; border-radius: 24px; padding: 40px 32px; transition: transform 180ms ease;" style-hover="transform: translateY(-6px);">
+          <div style="width: 52px; height: 52px; border-radius: 9999px; background: #E33529; color: #F3F3E9; display: flex; align-items: center; justify-content: center; font-family: 'Bayon', sans-serif; font-size: 24px; margin-bottom: 22px;">3</div>
+          <h3 style="font-family: 'Bayon', sans-serif; font-size: 34px; line-height: 0.85; text-transform: uppercase; letter-spacing: -0.01em; margin: 0 0 14px; color: #000000;">An honest gut-load estimate</h3>
+          <p style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; line-height: 1.65; color: #000000; margin: 0;">A concentration warning presented as an estimate, not a lab reading — with clear guidance on what to sip and what to chase with water.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= COMING NEXT (red) ======================= -->
+  <section id="coming-next" data-screen-label="Coming next" style="background: #E33529; overflow: hidden;">
+    <div style="max-width: 1280px; margin: 0 auto; padding: clamp(64px, 8vw, 110px) clamp(1rem, 4vw, 3rem);">
+      <h2 style="font-family: 'Bayon', sans-serif; font-size: clamp(56px, 9vw, 150px); line-height: 0.8; text-transform: uppercase; color: #F3F3E9; margin: 0 0 clamp(32px, 4vw, 56px); letter-spacing: -0.02em;">Coming<br>next</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 32px;">
+        <span style="font-family: 'Bayon', sans-serif; font-size: 21px; letter-spacing: 0; text-transform: uppercase; color: #E33529; background: #F3F3E9; padding: 14px 28px; border-radius: 9999px;">AI fuelling prompt generator</span>
+        <span style="font-family: 'Bayon', sans-serif; font-size: 21px; letter-spacing: 0; text-transform: uppercase; color: #E33529; background: #F3F3E9; padding: 14px 28px; border-radius: 9999px;">Marathon &amp; HYROX fuelling guides</span>
+        <span style="font-family: 'Bayon', sans-serif; font-size: 21px; letter-spacing: 0; text-transform: uppercase; color: #E33529; background: #F3F3E9; padding: 14px 28px; border-radius: 9999px;">Commercial gel comparison</span>
+      </div>
+      <p style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; line-height: 1.65; color: rgba(243, 243, 233, 0.9); max-width: 64ch; margin: 0;">Same rule as the calculator: numbers you can check, estimates labelled as estimates, and nothing that reads like a brochure.</p>
+    </div>
+  </section>
+
+  <!-- ======================= FOOTER ======================= -->
+  <footer data-screen-label="Footer" style="background: #000000; color: rgba(243, 243, 233, 0.7);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 32px clamp(1rem, 4vw, 3rem); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="assets/logo-star.svg" alt="" width="24" height="24">
+        <span style="font-family: 'Bayon', sans-serif; font-size: 17px; letter-spacing: 0; text-transform: uppercase; color: #F3F3E9;">50FiveStarGels</span>
+      </div>
+      <span style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;">© 2026 · Prices are estimates — check them against your own shop.</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showGate&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Entry gate&quot;}, &quot;bouncesToEnter&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 5, &quot;min&quot;: 1, &quot;max&quot;: 12, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Entry gate&quot;}}">
+class Component extends DCLogic {
+  state = { bounces: 0, entered: false, unmounted: false, popToggle: false, heroToggle: false, heroActive: false };
+
+  get needed() { return Math.max(1, this.props.bouncesToEnter ?? 5); }
+
+  quips = [
+    "It wants to be bounced. They all do.",
+    "That's one. Carbs loading…",
+    "Good pop. Isotonic, even.",
+    "Your glycogen stores thank you.",
+    "One more and you're through the tape.",
+  ];
+
+  componentDidMount() {
+    if (this.props.showGate === false) {
+      this.setState({ entered: true, unmounted: true });
+    }
+  }
+
+  enter() {
+    this.setState({ entered: true });
+    this._t = setTimeout(() => this.setState({ unmounted: true }), 750);
+  }
+
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._t2); }
+
+  renderVals() {
+    const { bounces, entered, unmounted, popToggle, heroToggle, heroActive } = this.state;
+    const needed = this.needed;
+    const left = Math.max(0, needed - bounces);
+    const popAnim = (t) => `gel-pop-${t ? "a" : "b"} 620ms cubic-bezier(0.34, 1.3, 0.5, 1) both`;
+    const idle = "gel-idle 1.7s ease-in-out infinite";
+    return {
+      gateMounted: !unmounted,
+      gateTransform: entered ? "translateY(-100%)" : "translateY(0)",
+      gelAnim: bounces > 0 && !entered ? popAnim(popToggle) : idle,
+      heroGelAnim: heroActive ? popAnim(heroToggle) : idle,
+      counterLine: entered
+        ? "Fuelled. In you go."
+        : left === needed
+          ? `${needed} bounces to get in`
+          : `${left} to go`,
+      counterColor: entered ? "#2B6786" : "#E33529",
+      quipLine: entered ? "" : this.quips[Math.min(bounces, this.quips.length - 1)],
+      bounceGel: () => {
+        if (this.state.entered) return;
+        const b = this.state.bounces + 1;
+        this.setState({ bounces: b, popToggle: !this.state.popToggle });
+        if (b >= needed) {
+          clearTimeout(this._t2);
+          this._t2 = setTimeout(() => this.enter(), 650);
+        }
+      },
+      skipGate: () => this.enter(),
+      heroPoke: () => this.setState({ heroActive: true, heroToggle: !this.state.heroToggle }),
+      gelSettled: () => { if (this.state.heroActive) this.setState({ heroActive: false }); },
+    };
+  }
+}
+</script>
+</body>
+</html>
