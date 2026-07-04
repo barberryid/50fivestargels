@@ -13,6 +13,8 @@ import {
   type PromptAnswers,
   type PromptType,
 } from '../../lib/promptBuilder';
+import UnitToggle, { useUnitSystem } from '../UnitToggle';
+import { displayWeight, weightBounds, weightToKg, weightUnit as weightUnitFor } from '../../lib/units';
 
 const stepEyebrowCls = 'font-sans text-[12px] font-extrabold uppercase tracking-[0.18em] text-accent';
 const stepHelperCls = 'font-body text-[15px] text-text-muted';
@@ -44,6 +46,7 @@ const INITIAL: PromptAnswers = {
   sport: 'marathon',
   durationMin: SPORT_PRESETS.marathon.durationMin,
   weightKg: 70,
+  weightUnit: 'kg',
   carbsPerHour: defaultCarbsPerHour(SPORT_PRESETS.marathon.durationMin),
   sweat: 'medium',
   sensitiveStomach: false,
@@ -83,10 +86,14 @@ export default function PromptGenerator() {
   const [type, setType] = useState<PromptType>('find-gels');
   const [copied, setCopied] = useState(false);
   const [showCarbsHelp, setShowCarbsHelp] = useState(false);
+  const [unitSystem, setUnitSystem] = useUnitSystem();
   const patch = (p: Partial<PromptAnswers>) => {
     setAnswers((a) => ({ ...a, ...p }));
     setCopied(false);
   };
+
+  const weightUnit = weightUnitFor(unitSystem);
+  const bounds = weightBounds(unitSystem);
 
   const carbsWarning =
     answers.carbsPerHour > 90
@@ -95,7 +102,10 @@ export default function PromptGenerator() {
         ? { tone: 'muted' as const, text: "That's quite low for a long session — most runners need at least 30 g/h." }
         : null;
 
-  const prompt = useMemo(() => buildPrompt(type, answers), [type, answers]);
+  const prompt = useMemo(
+    () => buildPrompt(type, { ...answers, weightUnit }),
+    [type, answers, weightUnit]
+  );
   const wordCount = useMemo(() => prompt.trim().split(/\s+/).length, [prompt]);
 
   const copy = () => {
@@ -117,7 +127,9 @@ export default function PromptGenerator() {
   const showCountryHint = type === 'find-gels' && !answers.country.trim();
 
   return (
-    <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
+    <div>
+      <UnitToggle value={unitSystem} onChange={setUnitSystem} />
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
       {/* LEFT: the form */}
       <div className="flex min-w-0 flex-col gap-11">
         {/* Step 1 */}
@@ -227,19 +239,22 @@ export default function PromptGenerator() {
               <span className="relative block">
                 <input
                   type="number"
-                  min="30"
-                  max="200"
+                  min={bounds.min}
+                  max={bounds.max}
                   className={`${fieldInputCls} pr-12`}
-                  value={answers.weightKg}
+                  value={Math.round(displayWeight(answers.weightKg, unitSystem))}
                   onKeyDown={blockNonDigitKeys}
                   onChange={(e) => {
                     const raw = Number(e.target.value);
-                    patch({ weightKg: Number.isFinite(raw) ? raw : 0 });
+                    patch({ weightKg: Number.isFinite(raw) ? weightToKg(raw, unitSystem) : 0 });
                   }}
-                  onBlur={(e) => patch({ weightKg: clamp(Number(e.target.value) || 30, 30, 200) })}
+                  onBlur={(e) => {
+                    const raw = clamp(Number(e.target.value) || bounds.min, bounds.min, bounds.max);
+                    patch({ weightKg: weightToKg(raw, unitSystem) });
+                  }}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
-                  kg
+                  {weightUnit}
                 </span>
               </span>
             </label>
@@ -430,6 +445,7 @@ export default function PromptGenerator() {
           </p>
         </div>
       </aside>
+      </div>
     </div>
   );
 }

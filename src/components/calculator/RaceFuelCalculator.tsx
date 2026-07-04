@@ -31,6 +31,8 @@ import {
   useCasePicks,
   type Region,
 } from '../../data/gels';
+import UnitToggle, { useUnitSystem } from '../UnitToggle';
+import { displayWeight, volumeLabel, weightBounds, weightToKg, weightUnit as weightUnitFor } from '../../lib/units';
 
 type Mode = 'bottle' | 'syrup' | 'commercial';
 
@@ -189,6 +191,9 @@ export default function RaceFuelCalculator() {
   const [ready, setReady] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showCarbsHelp, setShowCarbsHelp] = useState(false);
+  const [unitSystem, setUnitSystem] = useUnitSystem();
+  const weightUnit = weightUnitFor(unitSystem);
+  const weightBoundsDisplay = weightBounds(unitSystem);
   const patch = (p: Partial<CalcState>) => setState((s) => ({ ...s, ...p }));
   const patchPrices = (p: Partial<Prices>) =>
     setState((s) => ({ ...s, prices: { ...s.prices, ...p } }));
@@ -231,6 +236,13 @@ export default function RaceFuelCalculator() {
     [state, carbsPerHour]
   );
 
+  // fuelMath.ts stays unit-agnostic (always ml internally); build the
+  // display label here so it can respect the selected unit system.
+  const servingLabel =
+    state.mode === 'syrup'
+      ? `${volumeLabel(state.flaskMl, unitSystem)} soft flask of syrup — sip and chase with plain water`
+      : `${volumeLabel(state.bottleMl, unitSystem)} bottle — drink one per hour`;
+
   const savings = useMemo(
     () =>
       computeSavings(carbsPerHour, recipe.costPerGramCarb, state.prices, {
@@ -268,6 +280,7 @@ export default function RaceFuelCalculator() {
 
   return (
     <div className="fuel-card mt-8 p-5 sm:p-7">
+      <UnitToggle value={unitSystem} onChange={setUnitSystem} />
       {/* Mode tabs */}
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Calculator mode">
         <button
@@ -407,21 +420,24 @@ export default function RaceFuelCalculator() {
         </div>
         <div>
           <label className={labelCls} htmlFor="rf-weight">
-            Bodyweight (kg)
+            Bodyweight ({weightUnit})
           </label>
           <input
             id="rf-weight"
             type="number"
-            min="30"
-            max="200"
+            min={weightBoundsDisplay.min}
+            max={weightBoundsDisplay.max}
             className={inputCls}
-            value={state.weightKg}
+            value={Math.round(displayWeight(state.weightKg, unitSystem))}
             onKeyDown={blockNonDigitKeys}
             onChange={(e) => {
               const raw = Number(e.target.value);
-              patch({ weightKg: Number.isFinite(raw) ? raw : 0 });
+              patch({ weightKg: Number.isFinite(raw) ? weightToKg(raw, unitSystem) : 0 });
             }}
-            onBlur={(e) => patch({ weightKg: clamp(Number(e.target.value) || 30, 30, 200) })}
+            onBlur={(e) => {
+              const raw = clamp(Number(e.target.value) || weightBoundsDisplay.min, weightBoundsDisplay.min, weightBoundsDisplay.max);
+              patch({ weightKg: weightToKg(raw, unitSystem) });
+            }}
           />
         </div>
         <div>
@@ -483,7 +499,7 @@ export default function RaceFuelCalculator() {
             >
               {BOTTLE_SIZES_ML.map((ml) => (
                 <option key={ml} value={ml}>
-                  {ml} ml
+                  {volumeLabel(ml, unitSystem)}
                 </option>
               ))}
             </select>
@@ -502,7 +518,7 @@ export default function RaceFuelCalculator() {
               >
                 {FLASK_SIZES_ML.map((ml) => (
                   <option key={ml} value={ml}>
-                    {ml} ml
+                    {volumeLabel(ml, unitSystem)}
                   </option>
                 ))}
               </select>
@@ -562,7 +578,7 @@ export default function RaceFuelCalculator() {
           <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-text">
             Your recipe — per {state.mode === 'bottle' ? 'bottle' : 'flask'}
           </h3>
-          <p className="mb-3 mt-1 font-sans text-[12px] text-text-muted">{recipe.servingLabel}</p>
+          <p className="mb-3 mt-1 font-sans text-[12px] text-text-muted">{servingLabel}</p>
           <ul className="m-0 list-none space-y-2 p-0 font-sans text-[14px]">
             <li>
               <strong>{round(recipe.maltoG)} g</strong> maltodextrin{' '}
@@ -579,7 +595,7 @@ export default function RaceFuelCalculator() {
               </span>
             </li>
             <li>
-              <strong>{recipe.waterMlPerServing} ml</strong> water
+              <strong>{volumeLabel(recipe.waterMlPerServing, unitSystem)}</strong> water
             </li>
           </ul>
           <p className="mb-0 mt-3 font-sans text-[12px] text-text-muted">

@@ -2,6 +2,7 @@
 // Kept free of UI state so the generated text is easy to review and test.
 
 import { SODIUM_BY_SWEAT, SPORT_PRESETS, type SportKey, type SweatLevel } from '../data/defaults';
+import { kgToLb } from './units';
 
 export type PromptType =
   | 'find-gels'
@@ -19,6 +20,8 @@ export interface PromptAnswers {
   sport: SportKey;
   durationMin: number;
   weightKg: number;
+  /** Display unit for the bodyweight line only — weightKg above always stays canonical kg. */
+  weightUnit: 'kg' | 'lb';
   carbsPerHour: number;
   sweat: SweatLevel;
   sensitiveStomach: boolean;
@@ -84,11 +87,16 @@ function countryLabel(a: PromptAnswers): string {
   return a.country.trim() || 'my country';
 }
 
+function bodyweightLabel(a: PromptAnswers): string {
+  if (a.weightUnit === 'lb') return `${Math.round(kgToLb(a.weightKg))} lb`;
+  return `${a.weightKg} kg`;
+}
+
 function profileBlock(a: PromptAnswers): string {
   return [
     'My profile:',
     `- Sport / event: ${sportLabel(a)}`,
-    `- Bodyweight: ${a.weightKg} kg`,
+    `- Bodyweight: ${bodyweightLabel(a)}`,
     `- Target carbohydrate intake: ${a.carbsPerHour} g/hour`,
     `- Sweat level: ${a.sweat} (sodium target ~${SODIUM_BY_SWEAT[a.sweat]} mg/hour)`,
     `- Sensitive stomach: ${a.sensitiveStomach ? 'yes — prioritise gentle options' : 'no known issues'}`,
