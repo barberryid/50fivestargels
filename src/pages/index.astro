@@ -35,12 +35,6 @@ const comingNext = [
   chrome={false}
 >
   <Fragment slot="head-extra">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bayon&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <style>
       .gate-skip #entry-gate {
         display: none !important;
@@ -54,19 +48,19 @@ const comingNext = [
     }
   </script>
 
-  <div style="font-family:var(--font-gel-body);background:var(--color-cream);color:var(--color-ink);min-height:100vh;overflow-x:hidden;">
+  <div style="font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);min-height:100vh;overflow-x:hidden;">
     <!-- ======================= ENTRY GATE ======================= -->
     <div
       id="entry-gate"
-      style="position:fixed;inset:0;z-index:60;background:var(--color-cream);overflow:hidden;transition:transform 700ms cubic-bezier(0.65,0,0.35,1);will-change:transform;"
+      style="position:fixed;inset:0;z-index:60;background:var(--color-bg);overflow:hidden;transition:transform 700ms cubic-bezier(0.65,0,0.35,1);will-change:transform;"
     >
       <div style="position:absolute;top:24px;left:32px;display:flex;align-items:center;gap:12px;">
         <img src="/images/logo-star.svg" alt="" width="34" height="34" />
-        <span style="font-family:var(--font-display);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);">50Five<br />Star<br />Gels</span>
+        <span style="font-family:var(--font-serif);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">50Five<br />Star<br />Gels</span>
       </div>
 
-      <div style="position:absolute;top:48%;left:2vw;transform:translateY(-58%);z-index:3;pointer-events:none;font-family:var(--font-display);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-brand-red);letter-spacing:-0.02em;white-space:nowrap;">Bounce<br />the gel</div>
-      <div style="position:absolute;top:54%;right:2vw;transform:translateY(-38%);z-index:3;pointer-events:none;text-align:right;font-family:var(--font-display);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-brand-red);letter-spacing:-0.02em;white-space:nowrap;">to get<br />in!</div>
+      <div style="position:absolute;top:48%;left:2vw;transform:translateY(-58%);z-index:3;pointer-events:none;font-family:var(--font-serif);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">Bounce<br />the gel</div>
+      <div style="position:absolute;top:54%;right:2vw;transform:translateY(-38%);z-index:3;pointer-events:none;text-align:right;font-family:var(--font-serif);font-size:clamp(72px,14.5vw,270px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">to get<br />in!</div>
 
       <div id="gate-gel" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);cursor:pointer;display:flex;flex-direction:column;align-items:center;user-select:none;-webkit-tap-highlight-color:transparent;z-index:2;">
         <div id="gate-gel-anim" class="gel-bounce-target">
@@ -90,39 +84,39 @@ const comingNext = [
       </div>
 
       <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);text-align:center;z-index:3;">
-        <div id="gate-counter" style="font-family:var(--font-display);font-size:26px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);">5 bounces to get in</div>
-        <div id="gate-quip" style="font-family:var(--font-gel-body);font-size:14px;font-weight:500;color:#000000;opacity:0.6;margin-top:6px;min-height:20px;">It wants to be bounced. They all do.</div>
+        <div id="gate-counter" style="font-family:var(--font-serif);font-size:26px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">5 bounces to get in</div>
+        <div id="gate-quip" style="font-family:var(--font-body);font-size:14px;font-weight:500;color:#000000;opacity:0.6;margin-top:6px;min-height:20px;">It wants to be bounced. They all do.</div>
         <a
           id="gate-skip"
           href="#top"
-          style="display:inline-block;margin-top:12px;font-family:var(--font-gel-body);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--color-brand-teal);text-decoration:underline;text-underline-offset:3px;cursor:pointer;"
+          style="display:inline-block;margin-top:12px;font-family:var(--font-body);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--color-green);text-decoration:underline;text-underline-offset:3px;cursor:pointer;"
           >In a hurry? Skip the warm-up →</a
         >
       </div>
     </div>
 
     <!-- ======================= HERO ======================= -->
-    <section id="top" style="position:relative;min-height:100vh;overflow:hidden;background:var(--color-cream);">
+    <section id="top" style="position:relative;min-height:100vh;overflow:hidden;background:var(--color-bg);">
       <header style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;padding:24px 32px;gap:24px;">
         <div style="display:flex;align-items:center;gap:12px;">
           <img src="/images/logo-star.svg" alt="" width="34" height="34" />
-          <span style="font-family:var(--font-display);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);">50Five<br />Star<br />Gels</span>
+          <span style="font-family:var(--font-serif);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">50Five<br />Star<br />Gels</span>
         </div>
         <nav style="display:flex;align-items:center;gap:36px;padding-top:10px;">
-          <a href="#calculator" class="gel-nav-link" style="font-family:var(--font-display);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);text-decoration:none;">Calculator</a>
-          <a href="#what-you-get" class="gel-nav-link" style="font-family:var(--font-display);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);text-decoration:none;">What you get</a>
-          <a href="#coming-next" class="gel-nav-link" style="font-family:var(--font-display);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-brand-red);text-decoration:none;">Coming next</a>
+          <a href="#calculator" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Calculator</a>
+          <a href="#what-you-get" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">What you get</a>
+          <a href="#coming-next" class="gel-nav-link" style="font-family:var(--font-serif);font-size:19px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Coming next</a>
         </nav>
         <a
           href="/running-gel-cost-calculator/"
           class="gel-pill-btn"
-          style="font-family:var(--font-gel-body);font-size:14px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--color-brand-red);color:var(--color-cream);padding:14px 26px;border-radius:9999px;margin-top:4px;text-decoration:none;transition:background 160ms ease;"
+          style="font-family:var(--font-body);font-size:14px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--color-accent);color:var(--color-bg);padding:14px 26px;border-radius:9999px;margin-top:4px;text-decoration:none;transition:background 160ms ease;"
           >Open calculator</a
         >
       </header>
 
-      <div style="position:absolute;top:48%;left:2vw;transform:translateY(-55%);z-index:3;pointer-events:none;font-family:var(--font-display);font-size:clamp(80px,16vw,300px);line-height:0.78;text-transform:uppercase;color:var(--color-brand-red);letter-spacing:-0.02em;white-space:nowrap;">The<br />right<br />gel</div>
-      <div style="position:absolute;top:58%;right:2vw;transform:translateY(-42%);z-index:3;pointer-events:none;text-align:right;font-family:var(--font-display);font-size:clamp(80px,16vw,300px);line-height:0.78;text-transform:uppercase;color:var(--color-brand-red);letter-spacing:-0.02em;white-space:nowrap;">changes<br />the race!</div>
+      <div style="position:absolute;top:48%;left:2vw;transform:translateY(-55%);z-index:3;pointer-events:none;font-family:var(--font-serif);font-size:clamp(80px,16vw,300px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">The<br />right<br />gel</div>
+      <div style="position:absolute;top:58%;right:2vw;transform:translateY(-42%);z-index:3;pointer-events:none;text-align:right;font-family:var(--font-serif);font-size:clamp(80px,16vw,300px);line-height:0.78;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;white-space:nowrap;">changes<br />the race!</div>
 
       <div id="hero-gel" title="Go on, bounce it" style="position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);z-index:2;cursor:pointer;display:flex;flex-direction:column;align-items:center;user-select:none;-webkit-tap-highlight-color:transparent;">
         <div id="hero-gel-anim" class="gel-bounce-target">
@@ -131,27 +125,27 @@ const comingNext = [
         <div style="width:340px;height:24px;border-radius:50%;background:#000000;opacity:0.18;filter:blur(10px);margin-top:-10px;"></div>
       </div>
 
-      <div style="position:absolute;left:32px;bottom:28px;z-index:3;font-family:var(--font-gel-body);font-size:13px;font-weight:500;letter-spacing:0.04em;color:#000000;opacity:0.65;text-transform:uppercase;">Free · no sign-up · results shareable by link</div>
-      <div style="position:absolute;right:32px;bottom:28px;z-index:3;font-family:var(--font-display);font-size:17px;letter-spacing:0.02em;text-transform:uppercase;color:var(--color-brand-teal);">Scroll ↓</div>
+      <div style="position:absolute;left:32px;bottom:28px;z-index:3;font-family:var(--font-body);font-size:13px;font-weight:500;letter-spacing:0.04em;color:#000000;opacity:0.65;text-transform:uppercase;">Free · no sign-up · results shareable by link</div>
+      <div style="position:absolute;right:32px;bottom:28px;z-index:3;font-family:var(--font-serif);font-size:17px;letter-spacing:0.02em;text-transform:uppercase;color:var(--color-green);">Scroll ↓</div>
     </section>
 
     <!-- ======================= STATEMENT ======================= -->
     <section style="background:var(--color-tint-pink);">
       <div style="max-width:1100px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(1rem,4vw,3rem);text-align:center;">
-        <div style="font-family:var(--font-display);font-size:clamp(38px,5.2vw,84px);line-height:0.85;text-transform:uppercase;color:var(--color-brand-red);letter-spacing:-0.02em;">Race fuel,<br />priced honestly.</div>
+        <div style="font-family:var(--font-serif);font-size:clamp(38px,5.2vw,84px);line-height:0.85;text-transform:uppercase;color:var(--color-accent);letter-spacing:-0.02em;">Race fuel,<br />priced honestly.</div>
       </div>
     </section>
 
     <!-- ======================= CTA ======================= -->
-    <section id="calculator" style="background:var(--color-brand-teal);">
+    <section id="calculator" style="background:var(--color-green);">
       <div style="max-width:1280px;margin:0 auto;padding:clamp(64px,8vw,110px) clamp(1rem,4vw,3rem);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:48px;align-items:center;">
-        <h2 style="font-family:var(--font-display);font-size:clamp(42px,5vw,80px);line-height:0.82;text-transform:uppercase;color:var(--color-cream);margin:0;letter-spacing:-0.02em;">Stop overpaying for race fuel.</h2>
+        <h2 style="font-family:var(--font-serif);font-size:clamp(42px,5vw,80px);line-height:0.82;text-transform:uppercase;color:var(--color-bg);margin:0;letter-spacing:-0.02em;">Stop overpaying for race fuel.</h2>
         <div>
-          <p style="font-family:var(--font-gel-body);font-size:17px;font-weight:500;line-height:1.65;color:var(--color-cream);margin:0 0 28px;">Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training — with editable prices that work in any currency.</p>
+          <p style="font-family:var(--font-body);font-size:17px;font-weight:500;line-height:1.65;color:var(--color-bg);margin:0 0 28px;">Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training — with editable prices that work in any currency.</p>
           <a
             href="/running-gel-cost-calculator/"
             class="gel-cta-btn"
-            style="display:inline-block;font-family:var(--font-gel-body);font-size:15px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--color-brand-red);color:var(--color-cream);padding:18px 32px;border-radius:9999px;text-decoration:none;transition:transform 160ms ease,background 160ms ease;"
+            style="display:inline-block;font-family:var(--font-body);font-size:15px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--color-accent);color:var(--color-bg);padding:18px 32px;border-radius:9999px;text-decoration:none;transition:transform 160ms ease,background 160ms ease;"
             >Open the calculator →</a
           >
         </div>
@@ -159,18 +153,18 @@ const comingNext = [
     </section>
 
     <!-- ======================= WHAT YOU GET ======================= -->
-    <section id="what-you-get" style="background:var(--color-cream-alt);">
+    <section id="what-you-get" style="background:var(--color-bg-soft);">
       <div style="max-width:1280px;margin:0 auto;padding:clamp(72px,9vw,130px) clamp(1rem,4vw,3rem);">
-        <h2 style="font-family:var(--font-display);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-brand-red);margin:0 0 clamp(36px,5vw,64px);letter-spacing:-0.02em;">What<br />you get</h2>
+        <h2 style="font-family:var(--font-serif);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-accent);margin:0 0 clamp(36px,5vw,64px);letter-spacing:-0.02em;">What<br />you get</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
           {
             cards.map((card, i) => (
               <div class="gel-card" style={`background:${card.tint};border-radius:24px;padding:40px 32px;transition:transform 180ms ease;`}>
-                <div style="width:52px;height:52px;border-radius:9999px;background:var(--color-brand-red);color:var(--color-cream);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:24px;margin-bottom:22px;">
+                <div style="width:52px;height:52px;border-radius:9999px;background:var(--color-accent);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:24px;margin-bottom:22px;">
                   {i + 1}
                 </div>
-                <h3 style="font-family:var(--font-display);font-size:34px;line-height:0.85;text-transform:uppercase;letter-spacing:-0.01em;margin:0 0 14px;color:#000000;">{card.title}</h3>
-                <p style="font-family:var(--font-gel-body);font-size:15px;font-weight:500;line-height:1.65;color:#000000;margin:0;">{card.body}</p>
+                <h3 style="font-family:var(--font-serif);font-size:34px;line-height:0.85;text-transform:uppercase;letter-spacing:-0.01em;margin:0 0 14px;color:#000000;">{card.title}</h3>
+                <p style="font-family:var(--font-body);font-size:15px;font-weight:500;line-height:1.65;color:#000000;margin:0;">{card.body}</p>
               </div>
             ))
           }
@@ -179,19 +173,19 @@ const comingNext = [
     </section>
 
     <!-- ======================= COMING NEXT ======================= -->
-    <section id="coming-next" style="background:var(--color-brand-red);overflow:hidden;">
+    <section id="coming-next" style="background:var(--color-accent);overflow:hidden;">
       <div style="max-width:1280px;margin:0 auto;padding:clamp(64px,8vw,110px) clamp(1rem,4vw,3rem);">
-        <h2 style="font-family:var(--font-display);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-cream);margin:0 0 clamp(32px,4vw,56px);letter-spacing:-0.02em;">Coming<br />next</h2>
+        <h2 style="font-family:var(--font-serif);font-size:clamp(56px,9vw,150px);line-height:0.8;text-transform:uppercase;color:var(--color-bg);margin:0 0 clamp(32px,4vw,56px);letter-spacing:-0.02em;">Coming<br />next</h2>
         <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:32px;">
           {
             comingNext.map((label) => (
-              <span style="font-family:var(--font-display);font-size:21px;letter-spacing:0;text-transform:uppercase;color:var(--color-brand-red);background:var(--color-cream);padding:14px 28px;border-radius:9999px;">
+              <span style="font-family:var(--font-serif);font-size:21px;letter-spacing:0;text-transform:uppercase;color:var(--color-accent);background:var(--color-bg);padding:14px 28px;border-radius:9999px;">
                 {label}
               </span>
             ))
           }
         </div>
-        <p style="font-family:var(--font-gel-body);font-size:16px;font-weight:500;line-height:1.65;color:rgba(243,243,233,0.9);max-width:64ch;margin:0;">Same rule as the calculator: numbers you can check, estimates labelled as estimates, and nothing that reads like a brochure.</p>
+        <p style="font-family:var(--font-body);font-size:16px;font-weight:500;line-height:1.65;color:rgba(243,243,233,0.9);max-width:64ch;margin:0;">Same rule as the calculator: numbers you can check, estimates labelled as estimates, and nothing that reads like a brochure.</p>
       </div>
     </section>
 
@@ -200,9 +194,9 @@ const comingNext = [
       <div style="max-width:1280px;margin:0 auto;padding:32px clamp(1rem,4vw,3rem);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
         <div style="display:flex;align-items:center;gap:10px;">
           <img src="/images/logo-star.svg" alt="" width="24" height="24" />
-          <span style="font-family:var(--font-display);font-size:17px;letter-spacing:0;text-transform:uppercase;color:var(--color-cream);">50FiveStarGels</span>
+          <span style="font-family:var(--font-serif);font-size:17px;letter-spacing:0;text-transform:uppercase;color:var(--color-bg);">50FiveStarGels</span>
         </div>
-        <span style="font-family:var(--font-gel-body);font-size:13px;font-weight:500;">© 2026 · Prices are estimates — check them against your own shop.</span>
+        <span style="font-family:var(--font-body);font-size:13px;font-weight:500;">© 2026 · Prices are estimates — check them against your own shop.</span>
       </div>
     </footer>
   </div>
@@ -271,7 +265,7 @@ const comingNext = [
       if (entered) return;
       entered = true;
       counterEl!.textContent = 'Fuelled. In you go.';
-      (counterEl as HTMLElement).style.color = 'var(--color-brand-teal)';
+      (counterEl as HTMLElement).style.color = 'var(--color-green)';
       quipEl!.textContent = '';
       (gate as HTMLElement).style.transform = 'translateY(-100%)';
       sessionStorage.setItem(GATE_KEY, '1');

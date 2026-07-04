@@ -2,44 +2,39 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* Energetic race-fuel palette; same token conventions as 50fivestarhotels */
-  --color-bg: #F7F4EB;
-  --color-bg-soft: #F0EBDA;
+  /* dontboardme-style race-fuel palette, rolled out sitewide from the homepage/entry-gate redesign
+     (see design_handoff_homepage_entry_gate/). --color-green now carries the brand's teal secondary
+     accent (still used as the "safe/DIY" indicator in the gut-load traffic light); amber/red stay
+     literal amber/red so the calculator's caution/danger states remain visually distinct. */
+  --color-bg: #F3F3E9;
+  --color-bg-soft: #F6F6ED;
   --color-bg-card: #FFFFFF;
-  --color-text: #23211B;
-  --color-text-muted: #5B5548;
-  --color-accent: #D95A2B;
-  --color-accent-deep: #A8431F;
-  --color-green: #4C7A3F;
-  --color-green-soft: #E5EDDD;
+  --color-text: #000000;
+  --color-text-muted: rgba(0, 0, 0, 0.62);
+  --color-accent: #E33529;
+  --color-accent-deep: #A8241C;
+  --color-green: #2B6786;
+  --color-green-soft: #DCEAEF;
   --color-amber: #C08A24;
   --color-amber-soft: #F6E9CB;
   --color-red: #BC3F2C;
   --color-red-soft: #F6DCD5;
   --color-border: #E3DCC6;
-  --color-paper-warm: #FBF8EF;
-  --color-ink-soft: #5B5548;
+  --color-paper-warm: #F6F6ED;
+  --color-ink-soft: rgba(0, 0, 0, 0.62);
 
-  --font-sans: Archivo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-serif: "Bodoni Moda", Georgia, "Times New Roman", serif;
-  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Bayon", sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  --shadow-card: 0 3px 18px rgba(35, 33, 27, 0.07);
-  --shadow-print: 5px 5px 0 rgba(217, 90, 43, 0.14);
-  --shadow-print-green: 5px 5px 0 rgba(76, 122, 63, 0.16);
+  --shadow-card: 0 3px 18px rgba(0, 0, 0, 0.08);
+  --shadow-print: 5px 5px 0 rgba(227, 53, 41, 0.16);
+  --shadow-print-green: 5px 5px 0 rgba(43, 103, 134, 0.18);
 
-  /* Homepage/entry-gate redesign (dontboardme-style) — see design_handoff_homepage_entry_gate/.
-     Namespaced separately from the tokens above so the calculator/guide pages are unaffected. */
-  --color-cream: #F3F3E9;
-  --color-cream-alt: #F6F6ED;
-  --color-brand-red: #E33529;
-  --color-brand-teal: #2B6786;
-  --color-ink: #000000;
+  /* Pastel card fills used on the homepage feature cards; no equivalent in the tokens above. */
   --color-tint-pink: #F4CED3;
   --color-tint-lavender: #EAD9EC;
   --color-tint-sky: #AFD8FB;
-  --font-display: "Bayon", sans-serif;
-  --font-gel-body: "Inter", sans-serif;
 }
 
 body {
@@ -50,10 +45,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4 {
+h1 {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+  color: var(--color-accent);
+}
+
+h2, h3, h4 {
   font-family: var(--font-serif);
   letter-spacing: 0;
-  font-optical-sizing: auto;
+  color: var(--color-accent);
 }
 
 a:focus-visible,
