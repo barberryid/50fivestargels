@@ -1,6 +1,6 @@
 // Race Fuel Cost Calculator — the only React island on the site (brief §10).
 // All maths lives in src/lib/fuelMath.ts; this file is state + presentation.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import {
   BOTTLE_SIZES_ML,
   DEFAULT_PRICES,
@@ -102,6 +102,15 @@ const num = (v: string | null): number | null => {
   if (v === null || v.trim() === '') return null;
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+// Number inputs: don't clamp min/max on every keystroke (it fights typing —
+// e.g. a min of 20 would snap "7" up to "20" before the user can type the
+// second digit of "75"). Parse loosely as the user types, clamp on blur.
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+const blockNonDigitKeys = (e: KeyboardEvent<HTMLInputElement>) => {
+  if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
 };
 
 function parseParams(search: string): Partial<CalcState> {
@@ -325,7 +334,12 @@ export default function RaceFuelCalculator() {
             max="1440"
             className={inputCls}
             value={state.durationMin}
-            onChange={(e) => patch({ sport: 'custom', durationMin: Math.max(20, Number(e.target.value) || 20) })}
+            onKeyDown={blockNonDigitKeys}
+            onChange={(e) => {
+              const raw = Number(e.target.value);
+              patch({ sport: 'custom', durationMin: Number.isFinite(raw) ? raw : 0 });
+            }}
+            onBlur={(e) => patch({ durationMin: clamp(Number(e.target.value) || 20, 20, 1440) })}
           />
         </div>
         <div className="col-span-2 md:col-span-1">
@@ -352,7 +366,12 @@ export default function RaceFuelCalculator() {
             max="150"
             className={inputCls}
             value={carbsPerHour}
-            onChange={(e) => patch({ carbsOverride: Math.max(10, Number(e.target.value) || 10) })}
+            onKeyDown={blockNonDigitKeys}
+            onChange={(e) => {
+              const raw = Number(e.target.value);
+              patch({ carbsOverride: Number.isFinite(raw) ? raw : 0 });
+            }}
+            onBlur={(e) => patch({ carbsOverride: clamp(Number(e.target.value) || 10, 10, 150) })}
             aria-describedby={`rf-carbs-help${carbsWarning ? ' rf-carbs-warning' : ''}`}
           />
           <p id="rf-carbs-help" className="mt-1 font-sans text-[11px] text-text-muted">
@@ -397,7 +416,12 @@ export default function RaceFuelCalculator() {
             max="200"
             className={inputCls}
             value={state.weightKg}
-            onChange={(e) => patch({ weightKg: Math.max(30, Number(e.target.value) || 30) })}
+            onKeyDown={blockNonDigitKeys}
+            onChange={(e) => {
+              const raw = Number(e.target.value);
+              patch({ weightKg: Number.isFinite(raw) ? raw : 0 });
+            }}
+            onBlur={(e) => patch({ weightKg: clamp(Number(e.target.value) || 30, 30, 200) })}
           />
         </div>
         <div>
@@ -494,7 +518,12 @@ export default function RaceFuelCalculator() {
                 max="8"
                 className={inputCls}
                 value={state.flaskCount}
-                onChange={(e) => patch({ flaskCount: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+                onKeyDown={blockNonDigitKeys}
+                onChange={(e) => {
+                  const raw = Number(e.target.value);
+                  patch({ flaskCount: Number.isFinite(raw) ? raw : 0 });
+                }}
+                onBlur={(e) => patch({ flaskCount: clamp(Math.round(Number(e.target.value) || 1), 1, 8) })}
               />
             </div>
           </>
@@ -708,7 +737,12 @@ export default function RaceFuelCalculator() {
               max="14"
               className={inputCls}
               value={state.sessionsPerWeek}
-              onChange={(e) => patch({ sessionsPerWeek: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+              onKeyDown={blockNonDigitKeys}
+              onChange={(e) => {
+                const raw = Number(e.target.value);
+                patch({ sessionsPerWeek: Number.isFinite(raw) ? raw : 0 });
+              }}
+              onBlur={(e) => patch({ sessionsPerWeek: clamp(Math.round(Number(e.target.value) || 1), 1, 14) })}
             />
           </div>
           <div>
@@ -722,7 +756,12 @@ export default function RaceFuelCalculator() {
               max="600"
               className={inputCls}
               value={state.avgSessionMin}
-              onChange={(e) => patch({ avgSessionMin: Math.max(20, Number(e.target.value) || 20) })}
+              onKeyDown={blockNonDigitKeys}
+              onChange={(e) => {
+                const raw = Number(e.target.value);
+                patch({ avgSessionMin: Number.isFinite(raw) ? raw : 0 });
+              }}
+              onBlur={(e) => patch({ avgSessionMin: clamp(Number(e.target.value) || 20, 20, 600) })}
             />
           </div>
           <div>
@@ -736,7 +775,12 @@ export default function RaceFuelCalculator() {
               max="52"
               className={inputCls}
               value={state.weeks}
-              onChange={(e) => patch({ weeks: Math.max(1, Math.round(Number(e.target.value) || 1)) })}
+              onKeyDown={blockNonDigitKeys}
+              onChange={(e) => {
+                const raw = Number(e.target.value);
+                patch({ weeks: Number.isFinite(raw) ? raw : 0 });
+              }}
+              onBlur={(e) => patch({ weeks: clamp(Math.round(Number(e.target.value) || 1), 1, 52) })}
             />
           </div>
         </div>

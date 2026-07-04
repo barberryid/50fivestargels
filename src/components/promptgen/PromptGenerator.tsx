@@ -2,7 +2,7 @@
 // Questionnaire (goal → event/profile → preferences) with a sticky prompt
 // panel that updates live, per design_handoff_prompt_creator/. All prompt
 // text is assembled in src/lib/promptBuilder.ts.
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type KeyboardEvent } from 'react';
 import { SPORT_PRESETS, defaultCarbsPerHour, type SweatLevel } from '../../data/defaults';
 import {
   PROMPT_TYPES,
@@ -52,6 +52,15 @@ const INITIAL: PromptAnswers = {
   budget: 'value',
   preference: 'both',
   container: 'bottles',
+};
+
+// Number inputs: don't clamp min/max on every keystroke (it fights typing —
+// e.g. a min of 20 would snap "7" up to "20" before the user can type the
+// second digit of "75"). Parse loosely as the user types, clamp on blur.
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+const blockNonDigitKeys = (e: KeyboardEvent<HTMLInputElement>) => {
+  if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
 };
 
 function fallbackCopy(text: string) {
@@ -197,9 +206,15 @@ export default function PromptGenerator() {
                   max="1440"
                   className={`${fieldInputCls} pr-12`}
                   value={answers.durationMin}
+                  onKeyDown={blockNonDigitKeys}
                   onChange={(e) => {
-                    const durationMin = Math.max(20, Number(e.target.value) || 20);
-                    patch({ sport: 'custom', durationMin, carbsPerHour: defaultCarbsPerHour(durationMin) });
+                    const raw = Number(e.target.value);
+                    const durationMin = Number.isFinite(raw) ? raw : 0;
+                    patch({ sport: 'custom', durationMin, carbsPerHour: defaultCarbsPerHour(Math.max(20, durationMin)) });
+                  }}
+                  onBlur={(e) => {
+                    const durationMin = clamp(Number(e.target.value) || 20, 20, 1440);
+                    patch({ durationMin, carbsPerHour: defaultCarbsPerHour(durationMin) });
                   }}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
@@ -216,7 +231,12 @@ export default function PromptGenerator() {
                   max="200"
                   className={`${fieldInputCls} pr-12`}
                   value={answers.weightKg}
-                  onChange={(e) => patch({ weightKg: Math.max(30, Number(e.target.value) || 30) })}
+                  onKeyDown={blockNonDigitKeys}
+                  onChange={(e) => {
+                    const raw = Number(e.target.value);
+                    patch({ weightKg: Number.isFinite(raw) ? raw : 0 });
+                  }}
+                  onBlur={(e) => patch({ weightKg: clamp(Number(e.target.value) || 30, 30, 200) })}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
                   kg
@@ -249,7 +269,12 @@ export default function PromptGenerator() {
                   step={5}
                   className={`${fieldInputCls} pr-12`}
                   value={answers.carbsPerHour}
-                  onChange={(e) => patch({ carbsPerHour: Math.max(10, Number(e.target.value) || 10) })}
+                  onKeyDown={blockNonDigitKeys}
+                  onChange={(e) => {
+                    const raw = Number(e.target.value);
+                    patch({ carbsPerHour: Number.isFinite(raw) ? raw : 0 });
+                  }}
+                  onBlur={(e) => patch({ carbsPerHour: clamp(Number(e.target.value) || 10, 10, 150) })}
                   aria-describedby={`pg-carbs-help${carbsWarning ? ' pg-carbs-warning' : ''}`}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-sans text-[12px] text-text-muted">
