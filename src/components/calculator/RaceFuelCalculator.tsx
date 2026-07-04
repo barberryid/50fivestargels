@@ -92,6 +92,12 @@ const GUT_COPY: Record<GutLoadLevel, { chip: string; label: string; advice: stri
   },
 };
 
+const CARBS_PRESETS = [
+  { value: 45, label: 'Cautious gut' },
+  { value: 60, label: 'Standard' },
+  { value: 90, label: 'Trained gut' },
+] as const;
+
 const num = (v: string | null): number | null => {
   if (v === null || v.trim() === '') return null;
   const n = Number(v);
@@ -173,6 +179,7 @@ export default function RaceFuelCalculator() {
   const [state, setState] = useState<CalcState>(INITIAL);
   const [ready, setReady] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showCarbsHelp, setShowCarbsHelp] = useState(false);
   const patch = (p: Partial<CalcState>) => setState((s) => ({ ...s, ...p }));
   const patchPrices = (p: Partial<Prices>) =>
     setState((s) => ({ ...s, prices: { ...s.prices, ...p } }));
@@ -183,6 +190,12 @@ export default function RaceFuelCalculator() {
   }, []);
 
   const carbsPerHour = state.carbsOverride ?? defaultCarbsPerHour(state.durationMin);
+  const carbsWarning =
+    carbsPerHour > 90
+      ? { tone: 'amber' as const, text: "High intake — only recommended if you've trained your gut for it." }
+      : carbsPerHour < 30
+        ? { tone: 'muted' as const, text: "That's quite low for a long session — most runners need at least 30 g/h." }
+        : null;
 
   useEffect(() => {
     if (!ready) return;
@@ -315,10 +328,23 @@ export default function RaceFuelCalculator() {
             onChange={(e) => patch({ sport: 'custom', durationMin: Math.max(20, Number(e.target.value) || 20) })}
           />
         </div>
-        <div>
+        <div className="col-span-2 md:col-span-1">
           <label className={labelCls} htmlFor="rf-carbs">
             Carbs g/hour
           </label>
+          <div className="mb-2 flex flex-wrap gap-2">
+            {CARBS_PRESETS.map((p) => (
+              <button
+                key={p.value}
+                type="button"
+                aria-pressed={carbsPerHour === p.value}
+                className={chipCls(carbsPerHour === p.value)}
+                onClick={() => patch({ carbsOverride: p.value })}
+              >
+                {p.label} · {p.value}
+              </button>
+            ))}
+          </div>
           <input
             id="rf-carbs"
             type="number"
@@ -327,10 +353,38 @@ export default function RaceFuelCalculator() {
             className={inputCls}
             value={carbsPerHour}
             onChange={(e) => patch({ carbsOverride: Math.max(10, Number(e.target.value) || 10) })}
+            aria-describedby={`rf-carbs-help${carbsWarning ? ' rf-carbs-warning' : ''}`}
           />
-          <p className="mt-1 font-sans text-[11px] text-text-muted">
-            Default for this duration: {defaultCarbsPerHour(state.durationMin)} g/h
+          <p id="rf-carbs-help" className="mt-1 font-sans text-[11px] text-text-muted">
+            Most runners handle 45–60 g/h. Above 90 g/h needs practice in training.{' '}
+            <button
+              type="button"
+              aria-expanded={showCarbsHelp}
+              onClick={() => setShowCarbsHelp((v) => !v)}
+              className="cursor-pointer border-0 bg-transparent p-0 font-sans text-[11px] font-bold text-accent underline underline-offset-2"
+            >
+              How do I choose?
+            </button>
           </p>
+          {showCarbsHelp && (
+            <ul className="m-0 mt-1 list-disc space-y-0.5 pl-4 font-sans text-[11px] text-text-muted">
+              <li>Under ~2.5 h: 30–60 g/h is plenty.</li>
+              <li>Marathon and longer: 60–90 g/h.</li>
+              <li>90–120 g/h: only if you've practiced high intake repeatedly in training.</li>
+            </ul>
+          )}
+          {carbsWarning && (
+            <p
+              id="rf-carbs-warning"
+              className={`mt-1 font-sans text-[11px] leading-relaxed ${
+                carbsWarning.tone === 'amber'
+                  ? 'rounded-md border border-amber bg-amber-soft px-2 py-1 text-amber'
+                  : 'text-text-muted'
+              }`}
+            >
+              {carbsWarning.text}
+            </p>
+          )}
         </div>
         <div>
           <label className={labelCls} htmlFor="rf-weight">
