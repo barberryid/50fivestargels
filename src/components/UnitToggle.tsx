@@ -9,14 +9,24 @@ const STORAGE_KEY = 'gels-unit-system';
 export function useUnitSystem(): [UnitSystem, (system: UnitSystem) => void] {
   const [system, setSystemState] = useState<UnitSystem>('metric');
 
+  // localStorage can throw (blocked storage, some private modes) — the
+  // toggle must keep working for the session even when persistence fails.
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved === 'metric' || saved === 'us' || saved === 'uk') setSystemState(saved);
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (saved === 'metric' || saved === 'us' || saved === 'uk') setSystemState(saved);
+    } catch {
+      /* fall back to the default system */
+    }
   }, []);
 
   const setSystem = (next: UnitSystem) => {
     setSystemState(next);
-    window.localStorage.setItem(STORAGE_KEY, next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      /* choice still applies for this page view */
+    }
   };
 
   return [system, setSystem];

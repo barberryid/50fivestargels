@@ -32,6 +32,7 @@ import {
   type Region,
 } from '../../data/gels';
 import UnitToggle, { useUnitSystem } from '../UnitToggle';
+import { copyToClipboard } from '../../lib/clipboard';
 import { displayWeight, volumeLabel, weightBounds, weightToKg, weightUnit as weightUnitFor } from '../../lib/units';
 
 type Mode = 'bottle' | 'syrup' | 'commercial';
@@ -115,6 +116,11 @@ const blockNonDigitKeys = (e: KeyboardEvent<HTMLInputElement>) => {
   if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
 };
 
+// Bottle/flask sizes come from <select>s, so URL params must land on an
+// actual option or the select renders out of sync with the recipe.
+const nearestSize = (value: number, sizes: readonly number[]): number =>
+  sizes.reduce((best, size) => (Math.abs(size - value) < Math.abs(best - value) ? size : best));
+
 function parseParams(search: string): Partial<CalcState> {
   const q = new URLSearchParams(search);
   const out: Partial<CalcState> = {};
@@ -125,30 +131,30 @@ function parseParams(search: string): Partial<CalcState> {
   const sport = q.get('sport');
   if (sport && (sport === 'custom' || sport in SPORT_PRESETS)) out.sport = sport as SportKey;
   const duration = num(q.get('duration'));
-  if (duration) out.durationMin = Math.min(duration, 1440);
+  if (duration) out.durationMin = clamp(duration, 20, 1440);
   const carbs = num(q.get('carbs'));
-  if (carbs) out.carbsOverride = Math.min(carbs, 150);
+  if (carbs) out.carbsOverride = clamp(carbs, 10, 150);
   const ratio = q.get('ratio');
   if (ratio === '2-1') out.ratio = 'simple';
   if (ratio === '1-08') out.ratio = 'advanced';
   const bottle = num(q.get('bottle'));
-  if (bottle) out.bottleMl = bottle;
+  if (bottle) out.bottleMl = nearestSize(bottle, BOTTLE_SIZES_ML);
   const flask = num(q.get('flask'));
-  if (flask) out.flaskMl = flask;
+  if (flask) out.flaskMl = nearestSize(flask, FLASK_SIZES_ML);
   const flasks = num(q.get('flasks'));
-  if (flasks) out.flaskCount = Math.min(Math.round(flasks), 8);
+  if (flasks) out.flaskCount = clamp(Math.round(flasks), 1, 8);
   const sweat = q.get('sweat');
   if (sweat === 'low' || sweat === 'medium' || sweat === 'high') out.sweat = sweat;
   const sodium = q.get('sodium');
   if (sodium === 'salt' || sodium === 'citrate') out.sodiumForm = sodium;
   const weight = num(q.get('weight'));
-  if (weight) out.weightKg = Math.min(weight, 200);
+  if (weight) out.weightKg = clamp(weight, 30, 200);
   const spw = num(q.get('spw'));
-  if (spw) out.sessionsPerWeek = Math.min(Math.round(spw), 14);
+  if (spw) out.sessionsPerWeek = clamp(Math.round(spw), 1, 14);
   const avg = num(q.get('avg'));
-  if (avg) out.avgSessionMin = Math.min(avg, 600);
+  if (avg) out.avgSessionMin = clamp(avg, 20, 600);
   const weeks = num(q.get('weeks'));
-  if (weeks) out.weeks = Math.min(Math.round(weeks), 52);
+  if (weeks) out.weeks = clamp(Math.round(weeks), 1, 52);
   return out;
 }
 
@@ -269,24 +275,21 @@ export default function RaceFuelCalculator() {
       : null;
 
   const share = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
+    if (await copyToClipboard(window.location.href)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable — the URL bar already has the params */
     }
+    /* if both copy paths fail, the URL bar already has the params */
   };
 
   return (
     <div className="fuel-card mt-8 p-5 sm:p-7">
       <UnitToggle value={unitSystem} onChange={setUnitSystem} />
-      {/* Mode tabs */}
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Calculator mode">
+      {/* Mode switcher — toggle buttons, not ARIA tabs (no tabpanel/arrow-key wiring) */}
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Calculator mode">
         <button
           type="button"
-          role="tab"
-          aria-selected={state.mode === 'bottle'}
+          aria-pressed={state.mode === 'bottle'}
           className={chipCls(state.mode === 'bottle')}
           onClick={() => patch({ mode: 'bottle' })}
         >
@@ -294,8 +297,7 @@ export default function RaceFuelCalculator() {
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={state.mode === 'syrup'}
+          aria-pressed={state.mode === 'syrup'}
           className={chipCls(state.mode === 'syrup')}
           onClick={() => patch({ mode: 'syrup' })}
         >
@@ -303,8 +305,7 @@ export default function RaceFuelCalculator() {
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={state.mode === 'commercial'}
+          aria-pressed={state.mode === 'commercial'}
           className={chipCls(state.mode === 'commercial')}
           onClick={() => patch({ mode: 'commercial' })}
         >
@@ -879,7 +880,8 @@ export default function RaceFuelCalculator() {
       </div>
       <div className="mt-5 rounded-lg border border-amber bg-amber-soft p-4 font-sans text-[13px] leading-relaxed">
         <strong>Caffeine is deliberately not in this calculator.</strong> If you use it: guidance is 3–6 mg per kg of
-        bodyweight (≈ {Math.round(state.weightKg * 3)}–{Math.round(state.weightKg * 6)} mg for {state.weightKg} kg),
+        bodyweight (≈ {Math.round(state.weightKg * 3)}–{Math.round(state.weightKg * 6)} mg for{' '}
+        {Math.round(displayWeight(state.weightKg, unitSystem))} {weightUnit}),
         taken 30–60 minutes before, tested in training first. Use gels or tablets with a measured dose — never pure
         caffeine powder.
       </div>

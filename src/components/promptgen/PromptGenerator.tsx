@@ -14,6 +14,7 @@ import {
   type PromptType,
 } from '../../lib/promptBuilder';
 import UnitToggle, { useUnitSystem } from '../UnitToggle';
+import { copyToClipboard } from '../../lib/clipboard';
 import { displayWeight, weightBounds, weightToKg, weightUnit as weightUnitFor } from '../../lib/units';
 
 const stepEyebrowCls = 'font-sans text-[12px] font-extrabold uppercase tracking-[0.18em] text-accent';
@@ -66,21 +67,6 @@ const blockNonDigitKeys = (e: KeyboardEvent<HTMLInputElement>) => {
   if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
 };
 
-function fallbackCopy(text: string) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.select();
-  try {
-    document.execCommand('copy');
-  } catch {
-    /* clipboard unavailable — user can select the text manually */
-  }
-  document.body.removeChild(ta);
-}
-
 export default function PromptGenerator() {
   const [answers, setAnswers] = useState<PromptAnswers>(INITIAL);
   const [type, setType] = useState<PromptType>('find-gels');
@@ -108,20 +94,12 @@ export default function PromptGenerator() {
   );
   const wordCount = useMemo(() => prompt.trim().split(/\s+/).length, [prompt]);
 
-  const copy = () => {
-    const done = () => {
+  const copy = async () => {
+    if (await copyToClipboard(prompt)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    };
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(prompt).then(done).catch(() => {
-        fallbackCopy(prompt);
-        done();
-      });
-    } else {
-      fallbackCopy(prompt);
-      done();
     }
+    /* on failure the prompt stays visible in the panel to select manually */
   };
 
   const showCountryHint = type === 'find-gels' && !answers.country.trim();
@@ -138,15 +116,13 @@ export default function PromptGenerator() {
             <p className={stepEyebrowCls}>Step 1 · What should the AI do?</p>
             <p className={stepHelperCls}>Pick one task. The prompt is rebuilt around it.</p>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" role="tablist" aria-label="Prompt type">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" role="group" aria-label="Prompt type">
             {(Object.keys(PROMPT_TYPES) as PromptType[]).map((key) => {
               const selected = type === key;
               return (
                 <button
                   key={key}
                   type="button"
-                  role="tab"
-                  aria-selected={selected}
                   aria-pressed={selected}
                   onClick={() => {
                     setType(key);
