@@ -81,7 +81,7 @@ const fuelingLinks = [
 
     <!-- ======================= CTA ======================= -->
     <section id="calculator" style="background:var(--color-green);">
-      <div style="max-width:1280px;margin:0 auto;padding:clamp(64px,8vw,110px) clamp(1rem,4vw,3rem);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:48px;align-items:center;">
+      <div class="home-cta-grid" style="max-width:1280px;margin:0 auto;padding:clamp(64px,8vw,110px) clamp(1rem,4vw,3rem);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:48px;align-items:center;">
         <h2 style="font-family:var(--font-serif);font-size:clamp(42px,5vw,80px);line-height:0.82;text-transform:uppercase;color:var(--color-bg);margin:0;letter-spacing:-0.02em;">Stop overpaying for race fuel.</h2>
         <div>
           <p style="font-family:var(--font-body);font-size:17px;font-weight:500;line-height:1.65;color:var(--color-bg);margin:0 0 28px;">Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training — with editable prices that work in any currency.</p>
@@ -175,12 +175,14 @@ const fuelingLinks = [
     }
 
     @media (max-width: 760px) {
+      /* The hero becomes a single-column grid in flow order:
+         tagline (::before) → "The right gel" → gel image → "changes the race!" → trainers.
+         The gel and trainers leave absolute positioning and are ordered between the titles. */
       .home-hero {
         min-height: 100svh !important;
         display: grid;
         align-content: start;
-        grid-template-rows: auto auto auto 1fr;
-        padding: 78px 16px 30px !important;
+        padding: 78px 16px 56px !important;
       }
 
       .home-hero-header {
@@ -208,33 +210,9 @@ const fuelingLinks = [
         display: none;
       }
 
+      /* The section links can't fit on a phone header; hiding the whole nav
+         (rather than showing a dead "Menu" label) keeps the header honest. */
       .home-hero-nav {
-        grid-column: 1;
-        grid-row: 1;
-        width: auto;
-        gap: 0 !important;
-        overflow: visible;
-        padding: 0 !important;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-      }
-
-      .home-hero-nav::before {
-        content: "Menu";
-        flex: 0 0 auto;
-        display: inline-flex;
-        align-items: center;
-        min-height: 34px;
-        color: var(--color-accent);
-        font-family: var(--font-body);
-        font-size: 14px;
-        font-weight: 800;
-        letter-spacing: 0;
-        text-transform: uppercase;
-      }
-
-      .home-hero-nav a {
         display: none !important;
       }
 
@@ -298,33 +276,33 @@ const fuelingLinks = [
       }
 
       .home-hero-title-left {
+        order: 1;
         margin: 0 auto;
       }
 
-      .home-hero-title-right {
-        margin: 10px auto 0;
-      }
-
       .home-hero-gel {
-        left: 50% !important;
-        right: auto !important;
-        top: auto !important;
-        bottom: 92px !important;
-        transform: translateX(-50%) rotate(-6deg) !important;
-        z-index: 4 !important;
+        order: 2;
+        position: static !important;
+        transform: rotate(-6deg) !important;
+        margin: 18px auto 6px;
       }
 
       .home-hero-gel img {
         height: clamp(150px, 42vw, 188px) !important;
       }
 
+      .home-hero-title-right {
+        order: 3;
+        margin: 10px auto 0;
+      }
+
       .home-hero-trainers {
-        left: 50% !important;
-        right: auto !important;
-        bottom: 22px !important;
+        order: 4;
+        position: static !important;
         height: clamp(118px, 36vw, 164px) !important;
         opacity: 0.82;
-        transform: translateX(-50%) scaleX(-1) !important;
+        margin: 16px auto 0;
+        transform: scaleX(-1) !important;
       }
 
       .home-hero > div[style*="left:32px"],
@@ -341,15 +319,17 @@ const fuelingLinks = [
       .home-hero > div[style*="right:32px"] {
         display: none !important;
       }
+
+      /* "Stop overpaying" CTA: two columns don't fit a phone — stack them. */
+      .home-cta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
     }
 
     @media (max-width: 420px) {
       .home-hero-title {
         font-size: clamp(58px, 18.5vw, 76px) !important;
-      }
-
-      .home-hero-gel {
-        bottom: 82px !important;
       }
     }
   </style>
