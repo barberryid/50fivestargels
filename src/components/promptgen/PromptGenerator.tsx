@@ -348,7 +348,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                       <button
                         key={preset.value}
                         type="button"
-                        className="flex-1 rounded-full border border-border bg-bg-soft px-1 py-2 font-sans text-[11.5px] font-semibold text-accent-deep transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-bg active:border-accent active:bg-accent active:text-bg"
+                        className="flex-1 rounded-full border border-accent bg-accent px-1 py-2 font-sans text-[11.5px] font-semibold text-bg transition-colors duration-150 hover:border-accent-deep hover:bg-accent-deep active:border-accent-deep active:bg-accent-deep"
                         onClick={() => {
                           setCarbs(preset.value);
                           setPhase('sweat');
