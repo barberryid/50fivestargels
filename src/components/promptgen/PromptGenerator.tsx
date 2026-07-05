@@ -226,51 +226,28 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
           : '';
 
   return (
-    <div
-      className="min-h-screen bg-[#fdfaf3] px-4 py-6 text-[#15201d] sm:px-6"
-      style={{ fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif' }}
-    >
+    <div className="bg-bg px-4 py-6 text-text font-body sm:px-6 lg:flex lg:justify-center lg:px-10 lg:py-14">
       <style>{`
         @keyframes rf-caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
       `}</style>
-      <div className="mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-[390px] flex-col">
-        <div className="mb-2.5 flex items-center gap-2">
-          <img src="/images/logo-star.svg" alt="" className="h-[22px] w-[22px]" />
-          <span
-            className="text-[16px] font-semibold tracking-[-0.015em] text-[#15201d]"
-            style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
-          >
-            50fivestargels
-          </span>
-        </div>
-
+      <div className="mx-auto flex w-full max-w-[390px] flex-col lg:max-w-[480px] lg:rounded-2xl lg:border lg:border-border lg:bg-bg-card lg:px-9 lg:py-9 lg:shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
         <div className="mb-1 flex items-center gap-2.5">
           {step > 1 && (
             <button
               type="button"
               aria-label="Back"
               onClick={back}
-              className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-[#ddd6c4] bg-white p-0 text-[15px] text-[#8d3f1f] transition-colors duration-150 active:border-[#b85832] active:bg-[#f5f0e6]"
+              className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
             >
               ←
             </button>
           )}
-          <span className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#8d3f1f]">
+          <span className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-accent">
             {meta.eyebrow}
           </span>
         </div>
-        <h1
-          className="m-0 text-[26px] font-semibold normal-case leading-[1.08] tracking-[-0.015em] text-[#15201d]"
-          style={{ fontFamily: '"Playfair Display", Georgia, serif', textTransform: 'none' }}
-        >
-          {meta.title}
-        </h1>
-        <p
-          className="mb-3 mt-0 text-[13.5px] leading-[1.5] text-[#5c6762]"
-          style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}
-        >
-          {meta.sub}
-        </p>
+        <h1 className="m-0 text-[26px] leading-[1.05] lg:text-[32px]">{meta.title}</h1>
+        <p className="mb-3 mt-2 text-[13.5px] leading-[1.5] text-text-muted lg:text-[15px]">{meta.sub}</p>
 
         {step === 1 && (
           <div className="flex flex-col gap-2">
@@ -278,7 +255,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
               <button
                 key={item.key}
                 type="button"
-                className="flex min-h-[60px] flex-col gap-[3px] rounded-[14px] border border-[#ddd6c4] bg-white px-3.5 py-3 text-left transition-colors duration-150 active:border-[#b85832] active:bg-[#f5f0e6]"
+                className="flex min-h-[60px] flex-col gap-[3px] rounded-[14px] border border-border bg-white px-3.5 py-3 text-left transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
                 onClick={() => {
                   setTask(item.key);
                   setStep(2);
@@ -286,13 +263,8 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                   setCopied(false);
                 }}
               >
-                <span className="font-sans text-[14.5px] font-semibold leading-tight text-[#15201d]">{item.title}</span>
-                <span
-                  className="text-[12.5px] leading-[1.45] text-[#5c6762]"
-                  style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}
-                >
-                  {item.desc}
-                </span>
+                <span className="font-sans text-[14.5px] font-semibold leading-tight text-text">{item.title}</span>
+                <span className="text-[12.5px] leading-[1.45] text-text-muted">{item.desc}</span>
               </button>
             ))}
           </div>
@@ -309,8 +281,8 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                     type="button"
                     aria-pressed={active}
                     className={cx(
-                      'rounded-full border px-3 py-[7px] font-sans text-[12px] font-semibold transition-colors duration-150 active:border-[#b85832]',
-                      active ? 'border-[#b85832] bg-[#b85832] text-[#fdfaf3]' : 'border-[#ddd6c4] bg-white text-[#8d3f1f]'
+                      'rounded-full border px-3 py-[7px] font-sans text-[12px] font-semibold transition-colors duration-150 hover:border-accent active:border-accent',
+                      active ? 'border-accent bg-accent text-bg' : 'border-border bg-white text-accent-deep'
                     )}
                     onClick={() => {
                       setEventKey(event.key);
@@ -325,7 +297,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
               })}
             </div>
 
-            <div className="mb-3 flex flex-col gap-[7px] rounded-2xl bg-[#15201d] px-4 py-3">
+            <div className="mb-3 flex flex-col gap-[7px] rounded-2xl bg-text px-4 py-3">
               {fields.map((field) => {
                 const active = phase === field.key;
                 const hasValue = field.value !== '';
@@ -339,7 +311,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                     <span
                       className={cx(
                         'font-sans text-[9.5px] font-extrabold uppercase tracking-[0.18em]',
-                        active ? 'text-[#c49a3a]' : 'text-[rgba(244,239,228,0.5)]'
+                        active ? 'text-amber' : 'text-bg/50'
                       )}
                     >
                       {field.label}
@@ -347,21 +319,19 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                     <span className="flex items-baseline gap-[5px]">
                       <span
                         className={cx(
-                          'text-[22px] font-semibold leading-none',
-                          active || hasValue ? 'text-[#f4efe4]' : 'text-[rgba(244,239,228,0.3)]'
+                          'font-serif text-[22px] leading-none',
+                          active || hasValue ? 'text-bg' : 'text-bg/30'
                         )}
-                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
                       >
                         {hasValue ? field.value : '—'}
                       </span>
                       <span
                         aria-hidden="true"
-                        className={cx('text-[20px] text-[#b85832]', active ? 'animate-[rf-caret-blink_1s_step-end_infinite]' : 'opacity-0')}
-                        style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+                        className={cx('font-serif text-[20px] text-accent', active ? 'animate-[rf-caret-blink_1s_step-end_infinite]' : 'opacity-0')}
                       >
                         |
                       </span>
-                      <span className={cx('font-sans text-[10.5px] font-semibold', active ? 'text-[rgba(244,239,228,0.5)]' : 'text-[rgba(244,239,228,0.3)]')}>
+                      <span className={cx('font-sans text-[10.5px] font-semibold', active ? 'text-bg/50' : 'text-bg/30')}>
                         {field.unit}
                       </span>
                     </span>
@@ -378,7 +348,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                       <button
                         key={preset.value}
                         type="button"
-                        className="flex-1 rounded-full border border-[#ddd6c4] bg-[#f5f0e6] px-1 py-2 font-sans text-[11.5px] font-semibold text-[#8d3f1f] transition-colors duration-150 active:border-[#b85832] active:bg-[#b85832] active:text-[#fdfaf3]"
+                        className="flex-1 rounded-full border border-border bg-bg-soft px-1 py-2 font-sans text-[11.5px] font-semibold text-accent-deep transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-bg active:border-accent active:bg-accent active:text-bg"
                         onClick={() => {
                           setCarbs(preset.value);
                           setPhase('sweat');
@@ -400,12 +370,12 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                         key={key}
                         type="button"
                         className={cx(
-                          'flex h-[58px] items-center justify-center rounded-[14px] border p-0 font-sans text-[24px] font-semibold transition-colors duration-150 active:border-[#b85832] active:bg-[#b85832] active:text-[#fdfaf3]',
+                          'flex h-[58px] items-center justify-center rounded-[14px] border p-0 font-sans text-[24px] font-semibold transition-colors duration-150 lg:h-[62px]',
                           isEnter
-                            ? 'border-[#b85832] bg-[#b85832] text-[#fdfaf3]'
+                            ? 'border-accent bg-accent text-bg hover:bg-accent-deep active:bg-accent-deep'
                             : isBackspace
-                              ? 'border-[#ddd6c4] bg-[#f5f0e6] text-[#8d3f1f]'
-                              : 'border-[#ddd6c4] bg-white text-[#15201d]'
+                              ? 'border-border bg-bg-soft text-accent-deep hover:border-accent active:border-accent active:bg-accent active:text-bg'
+                              : 'border-border bg-white text-text hover:border-accent-deep active:border-accent active:bg-accent active:text-bg'
                         )}
                         onClick={() => {
                           if (isBackspace) tapBackspace();
@@ -418,12 +388,7 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                     );
                   })}
                 </div>
-                <p
-                  className="mx-0.5 mb-0 mt-2.5 text-[12px] leading-[1.5] text-[#5c6762]"
-                  style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}
-                >
-                  {padHint}
-                </p>
+                <p className="mx-0.5 mb-0 mt-2.5 text-[12px] leading-[1.5] text-text-muted">{padHint}</p>
               </>
             ) : (
               <>
@@ -432,24 +397,19 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
                     <button
                       key={item.key}
                       type="button"
-                      className="flex h-[62px] items-center justify-between rounded-[14px] border border-[#ddd6c4] bg-white px-[18px] font-sans transition-colors duration-150 active:border-[#b85832] active:bg-[#b85832]"
+                      className="flex h-[62px] items-center justify-between rounded-[14px] border border-border bg-white px-[18px] font-sans transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
                       onClick={() => {
                         setSweat(item.key);
                         setStep(3);
                         setCopied(false);
                       }}
                     >
-                      <span className="text-[16px] font-semibold text-[#15201d]">{item.label}</span>
-                      <span className="text-[12px] text-[#5c6762]" style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}>
-                        {item.desc}
-                      </span>
+                      <span className="text-[16px] font-semibold text-text">{item.label}</span>
+                      <span className="text-[12px] text-text-muted">{item.desc}</span>
                     </button>
                   ))}
                 </div>
-                <p
-                  className="mx-0.5 mb-0 mt-2.5 text-[12px] leading-[1.5] text-[#5c6762]"
-                  style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}
-                >
+                <p className="mx-0.5 mb-0 mt-2.5 text-[12px] leading-[1.5] text-text-muted">
                   Salt marks on your kit or cramping late in races usually means high.
                 </p>
               </>
@@ -463,30 +423,23 @@ export default function PromptGenerator({ units = 'kg', autoAdvance = true }: { 
               {[selectedTask.title, `${duration} min`, `${bodyweight} ${units}`, `${carbs} g/h · ${selectedSweat.label} sweat`].map((label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-[#ddd6c4] bg-[#f5f0e6] px-2.5 py-[5px] font-sans text-[11px] font-semibold text-[#1f4c3b]"
+                  className="rounded-full border border-border bg-bg-soft px-2.5 py-[5px] font-sans text-[11px] font-semibold text-green"
                 >
                   {label}
                 </span>
               ))}
             </div>
-            <div
-              className="mb-3 min-h-[280px] flex-1 overflow-y-auto whitespace-pre-wrap rounded-2xl border border-[#ddd6c4] bg-white px-4 py-3.5 text-[12.5px] leading-[1.65] text-[#283531]"
-              style={{ fontFamily: '"Source Serif 4", Georgia, serif' }}
-            >
+            <div className="mb-3 min-h-[280px] flex-1 overflow-y-auto whitespace-pre-wrap rounded-2xl border border-border bg-white px-4 py-3.5 text-[12.5px] leading-[1.65] text-text">
               {promptText}
             </div>
             <div className="flex flex-col gap-2 pb-1.5">
-              <button
-                type="button"
-                onClick={copy}
-                className="flex w-full items-center justify-center rounded-[10px] border-0 bg-[#b85832] px-[26px] py-[15px] font-sans text-[15px] font-semibold text-[#fdfaf3] transition-colors duration-150 hover:bg-[#a64c29]"
-              >
+              <button type="button" onClick={copy} className="fuel-btn fuel-btn-accent w-full border-0 text-[15px]">
                 {copied ? 'Copied — paste into your AI' : 'Copy prompt'}
               </button>
               <button
                 type="button"
                 onClick={restart}
-                className="border-0 bg-transparent p-2 font-sans text-[13px] font-semibold text-[#8d3f1f]"
+                className="border-0 bg-transparent p-2 font-sans text-[13px] font-semibold text-accent-deep hover:text-accent"
               >
                 Start over
               </button>
