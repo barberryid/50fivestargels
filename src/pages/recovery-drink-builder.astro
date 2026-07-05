@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RecoveryDrinkBuilder from '../components/recoverybuilder/RecoveryDrinkBuilder';
+import { webPageJsonLd, canonicalUrl } from '../lib/seo';
+import { AVAILABILITY_NOTES, RECOVERY_PRODUCTS, RECOVERY_VERDICTS } from '../data/recoveryData';
+
+const title = 'Recovery Drink Builder — DIY recipe + store-bought comparison | 50FiveStarGels';
+const description =
+  'Build a personalised DIY recovery drink from your bodyweight and session type — carbs, protein, sodium and cost, live — then compare it against seven verified commercial recovery mixes.';
+
+const webAppJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Recovery Drink Builder',
+  url: canonicalUrl('/recovery-drink-builder/'),
+  applicationCategory: 'HealthApplication',
+  operatingSystem: 'Web',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  description,
+};
+
+const steps = [
+  {
+    title: 'Answer the questions',
+    body: 'Bodyweight, session type, depletion, sweat level and goal emphasis — the recipe rebuilds itself as you go.',
+  },
+  {
+    title: 'Read your recipe',
+    body: 'Exact grams for every ingredient, macros, sodium, g/kg and an indicative cost per serving.',
+  },
+  {
+    title: 'Buy or mix',
+    body: 'Copy the recipe to mix it yourself, or scroll down to see how it stacks up against seven commercial recovery mixes.',
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/recovery-drink-builder/"
+  jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/recovery-drink-builder/' })]}
+>
+  <main style="max-width:1280px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(1rem,4vw,3rem) 20px;">
+    <div style="max-width:680px;display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
+      <p class="fuel-eyebrow">Recovery · DIY builder</p>
+      <h1 style="font-size:clamp(34px,4.5vw,52px);line-height:1.05;margin:0;">Build your recovery drink</h1>
+      <p style="font-size:18px;line-height:1.7;color:var(--color-text-muted);margin:0;">
+        Answer a few questions about your session and get a personalised DIY recovery-drink recipe with cost, shown
+        alongside the commercial mixes it's competing with. Whatever you mix is a training-tested starting point —
+        test it in training, never try anything new on race day.
+      </p>
+    </div>
+
+    <RecoveryDrinkBuilder client:load />
+
+    <section style="margin-top:56px;">
+      <p class="fuel-eyebrow">Store-bought comparison</p>
+      <h2 style="font-family:var(--font-serif);font-size:clamp(24px,3vw,32px);margin:8px 0 0;">
+        How it compares to commercial recovery mixes
+      </h2>
+      <p style="max-width:72ch;color:var(--color-text-muted);line-height:1.65;margin:12px 0 0;font-size:0.95rem;">
+        Prices indicative, verified July 2026 — check the retailer.
+      </p>
+
+      <div class="fuel-card" style="margin-top:20px;padding:0;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+          <thead>
+            <tr style="border-bottom:1.5px solid var(--color-border);">
+              {
+                ['Product', 'Carbs', 'Protein', 'Carb blend', 'Creatine?', 'Notable extras', 'Approx cost/serving', 'Markets'].map(
+                  (h) => (
+                    <th
+                      style="text-align:left;padding:12px 16px;font-family:var(--font-sans);font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);white-space:nowrap;"
+                    >
+                      {h}
+                    </th>
+                  )
+                )
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              RECOVERY_PRODUCTS.map((p, i) => (
+                <tr style={`border-bottom:1px solid var(--color-border);${i % 2 === 1 ? 'background:var(--color-bg-soft);' : ''}`}>
+                  <td style="padding:12px 16px;font-weight:700;white-space:nowrap;">
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);text-decoration:none;">
+                      {p.name}
+                    </a>
+                  </td>
+                  <td style="padding:12px 16px;white-space:nowrap;">{p.carbs}</td>
+                  <td style="padding:12px 16px;white-space:nowrap;">{p.protein}</td>
+                  <td style="padding:12px 16px;">{p.carbBlend}</td>
+                  <td style="padding:12px 16px;white-space:nowrap;">{p.creatine ? '✅' : '❌'}</td>
+                  <td style="padding:12px 16px;min-width:220px;">{p.extras}</td>
+                  <td style="padding:12px 16px;white-space:nowrap;">{p.costPerServing}</td>
+                  <td style="padding:12px 16px;white-space:nowrap;">{p.markets}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:20px;">
+        {
+          RECOVERY_VERDICTS.map((v) => (
+            <div class="fuel-card" style="padding:18px;">
+              <p class="fuel-eyebrow" style="margin:0;font-size:0.7rem;">{v.label}</p>
+              <p style="font-family:var(--font-sans);font-weight:800;margin:6px 0 0;font-size:0.95rem;">{v.product}</p>
+              <p style="color:var(--color-text-muted);line-height:1.6;font-size:0.88rem;margin:8px 0 0;">{v.note}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div style="margin-top:20px;">
+        <h3 style="font-family:var(--font-sans);font-size:0.95rem;font-weight:800;margin:0;">Availability by market</h3>
+        <ul style="margin:10px 0 0;padding-left:18px;color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;">
+          {AVAILABILITY_NOTES.map((n) => <li><strong>{n.market}:</strong> {n.note}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section style="margin-top:40px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">
+        {
+          steps.map((step, i) => (
+            <div class="fuel-card" style="padding:22px;">
+              <p class="fuel-eyebrow" style="margin:0;">Step {i + 1}</p>
+              <h2 style="font-family:var(--font-sans);font-size:1.02rem;font-weight:800;margin:8px 0 0;">
+                {step.title}
+              </h2>
+              <p style="color:var(--color-text-muted);line-height:1.65;font-size:0.95rem;margin:10px 0 0;">
+                {step.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section style="margin-top:28px;max-width:72ch;">
+      <h2 style="font-family:var(--font-sans);font-size:1.1rem;font-weight:800;margin:0;">
+        What's baked into every recipe
+      </h2>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.95rem;margin:10px 0 0;">
+        Every recipe uses a 2:1 glucose:fructose carb blend — it roughly doubles liver-glycogen repletion and
+        improves gut comfort versus glucose alone, though it doesn't speed muscle-glycogen resynthesis beyond glucose
+        alone. Protein is dosed for muscle repair, with its glycogen benefit mattering most when carbs fall short.
+        Sodium is tuned to your sweat level. Creatine is optional and fixed-dose. Antioxidants (vitamin C/E) are
+        deliberately left out of the auto recipe — they're occasional-only, not a daily addition, since chronic high
+        doses can blunt training adaptation. The recipe never includes caffeine.
+      </p>
+      <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;margin:14px 0 0;">
+        Want a fuelling plan for during the session instead? See the
+        <a href="/running-gel-cost-calculator/" style="color:var(--color-accent);font-weight:700;">
+          Race Fuel Cost Calculator
+        </a>
+        or the
+        <a href="/ai-race-fuel-prompt-generator/" style="color:var(--color-accent);font-weight:700;">
+          AI Race Fuel Prompt Generator
+        </a>
+        .
+      </p>
+    </section>
+  </main>
+</BaseLayout>
