@@ -1,0 +1,125 @@
+---
+import { fuelingLinks } from '../data/fuelingLinks';
+---
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay" aria-hidden="true">
+  <button type="button" class="mobile-menu-close" data-mobile-menu-close aria-label="Close menu">✕</button>
+  <h2 class="mobile-menu-heading">Get<br />fueling</h2>
+  <nav class="mobile-menu-links" aria-label="Mobile navigation">
+    {
+      fuelingLinks.map((link) => (
+        <a href={link.href}>{link.label}</a>
+      ))
+    }
+  </nav>
+  <p class="mobile-menu-footnote">
+    Same rule as the calculator: numbers you can check, estimates labelled as estimates, and nothing that reads like a
+    brochure.
+  </p>
+</div>
+
+<style>
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: var(--color-accent);
+    display: none;
+    flex-direction: column;
+    padding: 76px 24px 40px;
+    overflow-y: auto;
+  }
+
+  .mobile-menu-overlay.is-open {
+    display: flex;
+  }
+
+  .mobile-menu-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 9999px;
+    background: rgba(243, 243, 233, 0.16);
+    color: var(--color-bg);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mobile-menu-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(48px, 15vw, 76px);
+    line-height: 0.82;
+    text-transform: uppercase;
+    color: var(--color-bg);
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+  }
+
+  .mobile-menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mobile-menu-links a {
+    font-family: var(--font-serif);
+    font-size: 19px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--color-accent);
+    background: var(--color-bg);
+    padding: 16px 22px;
+    border-radius: 9999px;
+    text-decoration: none;
+  }
+
+  .mobile-menu-footnote {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: rgba(243, 243, 233, 0.85);
+    margin: 32px 0 0;
+  }
+
+  @media (min-width: 761px) {
+    .mobile-menu-overlay {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const closeBtn = overlay?.querySelector('[data-mobile-menu-close]');
+  const triggers = document.querySelectorAll<HTMLElement>('[data-mobile-menu-toggle]');
+
+  function setOpen(open: boolean) {
+    if (!overlay) return;
+    overlay.classList.toggle('is-open', open);
+    overlay.setAttribute('aria-hidden', String(!open));
+    triggers.forEach((trigger) => trigger.setAttribute('aria-expanded', String(open)));
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      setOpen(!overlay?.classList.contains('is-open'));
+    });
+  });
+
+  closeBtn?.addEventListener('click', () => setOpen(false));
+
+  overlay?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setOpen(false));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false);
+  });
+</script>

@@ -35,6 +35,16 @@ const links = [
         ))
       }
     </nav>
+    <button
+      type="button"
+      class="mobile-menu-trigger"
+      data-mobile-menu-toggle
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="mobile-menu-overlay"
+    >
+      Menu
+    </button>
   </div>
 </header>
 
@@ -47,15 +57,21 @@ const links = [
     background: var(--color-accent-deep);
   }
 
-  @media (max-width: 760px) {
-    .site-header-inner {
-      height: auto !important;
-      padding: 10px 12px 12px !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 10px !important;
-    }
+  .mobile-menu-trigger {
+    display: none;
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    cursor: pointer;
+  }
 
+  @media (max-width: 760px) {
     .site-brand {
       min-width: 0;
     }
@@ -67,25 +83,12 @@ const links = [
     }
 
     .site-nav {
-      width: 100%;
-      flex-wrap: wrap;
-      padding: 6px;
-      border: 1px solid var(--color-border);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.62);
+      display: none !important;
     }
 
-    .header-nav-link {
-      flex: 0 0 auto;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      min-height: 36px !important;
-      padding: 0 11px !important;
-      border-radius: 7px !important;
-      font-size: 12px !important;
-      text-align: center !important;
-      white-space: nowrap;
+    .mobile-menu-trigger {
+      display: inline-flex;
+      align-items: center;
     }
   }
 </style>
