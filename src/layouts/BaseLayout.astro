@@ -42,6 +42,6 @@ const { title, description, canonical, image, type, noindex, jsonLd, imageAlt, c
     {chrome && <Header />}
     <slot />
     {chrome && <Footer />}
-    <MobileMenuOverlay />
+    <MobileMenuOverlay currentPath={Astro.url.pathname} />
   </body>
 </html>

@@ -1,5 +1,15 @@
 ---
 import { fuelingLinks } from '../data/fuelingLinks';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+function linkPathname(href: string) {
+  return href.split('?')[0];
+}
 ---
 
 <div id="mobile-menu-overlay" class="mobile-menu-overlay" aria-hidden="true">
@@ -7,9 +17,14 @@ import { fuelingLinks } from '../data/fuelingLinks';
   <h2 class="mobile-menu-heading">Get<br />fueling</h2>
   <nav class="mobile-menu-links" aria-label="Mobile navigation">
     {
-      fuelingLinks.map((link) => (
-        <a href={link.href}>{link.label}</a>
-      ))
+      fuelingLinks.map((link) => {
+        const isCurrent = linkPathname(link.href) === currentPath;
+        return (
+          <a href={link.href} class={isCurrent ? 'is-current' : ''} aria-current={isCurrent ? 'page' : undefined}>
+            {link.label}
+          </a>
+        );
+      })
     }
   </nav>
   <p class="mobile-menu-footnote">
@@ -78,6 +93,21 @@ import { fuelingLinks } from '../data/fuelingLinks';
     text-decoration: none;
   }
 
+  .mobile-menu-links a.is-current {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .mobile-menu-links a.is-current::before {
+    content: "•";
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    line-height: 1;
+  }
+
   .mobile-menu-footnote {
     font-family: var(--font-body);
     font-size: 14px;
@@ -98,6 +128,19 @@ import { fuelingLinks } from '../data/fuelingLinks';
   const overlay = document.getElementById('mobile-menu-overlay');
   const closeBtn = overlay?.querySelector('[data-mobile-menu-close]');
   const triggers = document.querySelectorAll<HTMLElement>('[data-mobile-menu-toggle]');
+
+  // Server-side matching only knows the path, not the query string, so a link
+  // that shares a path with another (e.g. a ?mode= variant) gets marked "current"
+  // on both. Narrow it down here to whichever variant actually matches the URL.
+  overlay?.querySelectorAll<HTMLAnchorElement>('.mobile-menu-links a.is-current').forEach((link) => {
+    const href = link.getAttribute('href') || '';
+    const queryIndex = href.indexOf('?');
+    const linkSearch = queryIndex >= 0 ? href.slice(queryIndex) : '';
+    if (linkSearch !== window.location.search) {
+      link.classList.remove('is-current');
+      link.removeAttribute('aria-current');
+    }
+  });
 
   function setOpen(open: boolean) {
     if (!overlay) return;
