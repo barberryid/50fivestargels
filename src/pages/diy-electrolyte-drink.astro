@@ -1,0 +1,447 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SimpleTable from '../components/SimpleTable.astro';
+import { absoluteUrl, canonicalUrl, siteName, webPageJsonLd } from '../lib/seo';
+
+const title = 'DIY Electrolyte Drink Mix for Runners & HYROX | 50FiveStarGels';
+const pageTitle = 'DIY Electrolyte Drink Mix for Runners, HYROX and Heavy Sweaters';
+const description =
+  'Make your own electrolyte drink for running, HYROX and heavy sweating. Includes everyday and heavy-sweater recipes with sodium, potassium, carbs and safety notes.';
+const path = '/diy-electrolyte-drink/';
+
+const everydayRecipe = [
+  ['Water', '1 litre'],
+  ['Fine sea salt or table salt', '1.0 g'],
+  ['Sodium citrate', '1.0 g'],
+  ['Potassium chloride', '0.4 g'],
+  ['Dextrose, sugar, honey, or maple syrup', '10-20 g optional'],
+  ['Lemon or lime juice', 'To taste'],
+];
+
+const everydayNumbers = [
+  ['Sodium', '600-700 mg'],
+  ['Potassium', '200 mg'],
+  ['Carbohydrate', '10-20 g if added'],
+];
+
+const heavyRecipe = [
+  ['Water', '750 ml'],
+  ['Dextrose powder', '20 g'],
+  ['Sodium citrate', '2.0 g'],
+  ['Fine sea salt', '1.5 g'],
+  ['Potassium chloride', '0.7 g'],
+  ['Lemon or lime juice', 'To taste'],
+];
+
+const heavyNumbers = [
+  ['Carbohydrate', '20 g'],
+  ['Sodium', 'About 1,000-1,100 mg'],
+  ['Potassium', 'About 350-370 mg'],
+];
+
+const batchRecipe = [
+  ['Dextrose powder', '600 g'],
+  ['Sodium citrate', '60 g'],
+  ['Fine sea salt', '45 g'],
+  ['Potassium chloride', '21 g'],
+];
+
+const normalTargets = [
+  ['Sodium', '500-700 mg'],
+  ['Potassium', '150-250 mg'],
+  ['Carbohydrate', '0-30 g, depending on session'],
+  ['Magnesium', 'Optional; usually better handled through diet or separate supplementation'],
+];
+
+const faqs = [
+  {
+    question: 'Do I need electrolytes for every workout?',
+    answer:
+      'No. For short, easy sessions under about an hour, plain water and normal food are usually enough. Electrolytes become more useful for longer sessions, hot conditions, indoor HYROX training, heavy sweating, or quick recovery between sessions.',
+  },
+  {
+    question: 'What is the most important electrolyte for runners and HYROX athletes?',
+    answer:
+      'Sodium is usually the main one. Potassium matters too, but sodium is the electrolyte most heavily lost in sweat and the one most likely to affect hydration during long, hot, or sweaty sessions.',
+  },
+  {
+    question: 'Can I use this instead of gels?',
+    answer:
+      'Only partly. The everyday recipe is mainly a hydration drink. The stronger heavy-sweater mix contains 20 g carbohydrate, but it is not enough by itself for athletes targeting high carbohydrate intake such as 60 g/hour or more. For that, use gels, chews, or a dedicated carbohydrate drink alongside your electrolyte plan.',
+  },
+  {
+    question: 'Is the strong heavy-sweater recipe safe for everyone?',
+    answer:
+      'No. It is a strong sodium and potassium mix. It is intended for heavy sweaters who have tested it in training. People with kidney disease, heart disease, high blood pressure, diabetes, sodium restrictions, or medication affecting potassium or blood pressure should get medical advice first.',
+  },
+  {
+    question: 'Why use sodium citrate as well as salt?',
+    answer:
+      'Salt provides sodium chloride. Sodium citrate provides sodium in a form many athletes find smoother and easier to drink, especially when the drink contains a lot of sodium. Using both can improve taste and gut comfort.',
+  },
+  {
+    question: 'Should I add magnesium?',
+    answer:
+      'Usually not. Magnesium is important for general health, but it is not the main electrolyte lost in sweat. Many people tolerate magnesium better separately, especially in the evening. Too much magnesium in a sports drink can upset the stomach.',
+  },
+];
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  '@id': `${canonicalUrl(path)}#article`,
+  headline: pageTitle,
+  description,
+  url: canonicalUrl(path),
+  mainEntityOfPage: { '@id': `${canonicalUrl(path)}#webpage` },
+  author: { '@type': 'Organization', name: siteName, url: absoluteUrl('/') },
+  publisher: { '@id': absoluteUrl('/#organization') },
+  inLanguage: 'en',
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${canonicalUrl(path)}#faq`,
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl('/') },
+    { '@type': 'ListItem', position: 2, name: 'DIY electrolyte drink', item: canonicalUrl(path) },
+  ],
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={path}
+  type="article"
+  jsonLd={[
+    webPageJsonLd({ title: pageTitle, description, path }),
+    articleSchema,
+    faqSchema,
+    breadcrumbSchema,
+  ]}
+>
+  <main style="max-width:920px;margin:0 auto;padding:clamp(32px,5vw,64px) 20px 20px;">
+    <p class="fuel-eyebrow">DIY hydration</p>
+    <h1 style="font-size:clamp(2.25rem,5vw,4rem);line-height:0.92;margin:10px 0 0;">{pageTitle}</h1>
+    <p style="color:var(--color-text-muted);line-height:1.75;font-size:1.1rem;margin:20px 0 0;">
+      Commercial electrolyte tablets are convenient. But if you train often, sweat heavily, or want to control exactly
+      what goes into your bottle, a DIY electrolyte mix can be cheaper, stronger, and easier to adjust.
+    </p>
+
+    <aside class="fuel-card fuel-card-green" style="padding:20px;margin-top:26px;">
+      <p style="font-family:var(--font-sans);font-weight:800;margin:0;">Not medical advice</p>
+      <p style="color:var(--color-text-muted);line-height:1.65;margin:8px 0 0;">
+        This is a practical sports-drink recipe for healthy adults. If you have kidney disease, high blood pressure,
+        heart disease, diabetes, a sodium-restricted diet, or you take medication that affects potassium or blood
+        pressure, check with a clinician before using potassium chloride or high-sodium drinks.
+      </p>
+    </aside>
+
+    <div class="fuel-card" style="padding:20px;margin-top:22px;">
+      <p style="color:var(--color-text-muted);line-height:1.65;margin:0;">This page gives you two recipes:</p>
+      <ol style="color:var(--color-text-muted);line-height:1.65;margin:10px 0 0;padding-left:22px;">
+        <li>an everyday electrolyte drink for normal training</li>
+        <li>a stronger heavy-sweater mix for long runs, warm indoor sessions, HYROX training, and post-session rehydration</li>
+      </ol>
+    </div>
+
+    <section>
+      <h2>When do you actually need electrolytes?</h2>
+      <p>You probably do not need a special drink for every workout.</p>
+      <p>For short, easy sessions under about an hour, plain water and normal meals are usually enough.</p>
+      <p>Electrolytes become more useful when:</p>
+      <ul>
+        <li>you train for more than 60-75 minutes</li>
+        <li>you sweat heavily</li>
+        <li>your kit has white salt marks after training</li>
+        <li>your sweat stings your eyes</li>
+        <li>you are training indoors in a warm venue</li>
+        <li>you are doing HYROX-style work with repeated hard efforts</li>
+        <li>you need to recover quickly for another session</li>
+        <li>you feel flat, headachy, or unusually drained after sweaty training</li>
+      </ul>
+      <p>
+        The main electrolyte to think about is sodium. Potassium can help, but sodium is usually the biggest sweat-loss
+        problem for endurance athletes and heavy sweaters.
+      </p>
+    </section>
+
+    <section>
+      <h2>The simple rule</h2>
+      <p><strong>Most athletes need more sodium than they think, but not everyone needs a very salty drink.</strong></p>
+      <p>A good general training target is:</p>
+      <SimpleTable rows={normalTargets} head={['Per litre', 'Normal training target']} />
+      <p>
+        For longer races or hard endurance sessions, this drink does not replace your full fuelling plan. It can sit
+        alongside gels, chews, or a separate carbohydrate drink.
+      </p>
+    </section>
+
+    <section>
+      <h2>Recipe 1: Everyday DIY electrolyte drink</h2>
+      <p>Use this for normal runs, gym sessions, HYROX training, bike sessions, and warm-weather training.</p>
+      <h3>Ingredients for 1 litre</h3>
+      <SimpleTable rows={everydayRecipe} head={['Ingredient', 'Amount']} />
+      <h3>What it gives you, approximately</h3>
+      <SimpleTable rows={everydayNumbers} head={['Per litre', 'Approximate amount']} />
+      <p>
+        Use the lower-carb version when you only want hydration. Add 10-20 g carbohydrate when the session is longer,
+        hotter, or harder.
+      </p>
+      <p>If you are also taking gels, keep this drink lighter. You do not need every bottle to be a full fuel source.</p>
+    </section>
+
+    <section>
+      <h2>Recipe 2: Strong heavy-sweater mix</h2>
+      <p>
+        Use this when you know you lose a lot of salt, when you are doing a warm indoor HYROX-style session, or when
+        you want a stronger post-workout recovery bottle.
+      </p>
+      <h3>Ingredients for one 750 ml bottle</h3>
+      <SimpleTable rows={heavyRecipe} head={['Ingredient', 'Amount']} />
+      <h3>What it gives you, approximately</h3>
+      <SimpleTable rows={heavyNumbers} head={['Per 750 ml bottle', 'Approximate amount']} />
+      <aside class="fuel-card" style="padding:18px;margin-top:18px;">
+        <p style="font-weight:800;margin:0;">This is a strong mix.</p>
+        <p style="color:var(--color-text-muted);line-height:1.65;margin:8px 0 0;">
+          It is useful for heavy sweaters, but it is not the default drink for everyone. Test it in training before
+          using it on race day.
+        </p>
+      </aside>
+      <p>For many athletes, this is best used:</p>
+      <ul>
+        <li>60-90 minutes before a hot or sweaty session</li>
+        <li>after a long or very sweaty session</li>
+        <li>during training only if you already know your stomach tolerates it</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>30-serving heavy-sweater batch</h2>
+      <p>If you want to make a dry batch for the strong mix, use:</p>
+      <SimpleTable rows={batchRecipe} head={['Ingredient', 'Amount for 30 servings']} />
+      <p>One serving is about <strong>24.2 g powder</strong>. Mix one serving with <strong>750 ml water</strong>.</p>
+      <p>
+        Important: potassium chloride is potent and the powder can settle unevenly. Mix the dry batch extremely
+        thoroughly, shake the storage jar before portioning, and use a digital scale. If you want the safest accuracy,
+        weigh each serving individually instead of relying on scoops.
+      </p>
+    </section>
+
+    <section>
+      <h2>Why add carbohydrate?</h2>
+      <p>
+        A small amount of glucose helps the gut absorb sodium and water more effectively. That is the same basic logic
+        behind oral rehydration solutions.
+      </p>
+      <ul>
+        <li>use no carbohydrate for short easy sessions</li>
+        <li>use 10-20 g per litre when you want a light hydration drink</li>
+        <li>use 20-30 g per bottle for a stronger recovery or pre-race bottle</li>
+        <li>use separate gels or a dedicated carb drink if you are targeting 60 g/hour or more</li>
+      </ul>
+      <p>
+        Dextrose is the simplest powder because it is glucose. Sugar, honey, and maple syrup can also work.
+        Maltodextrin is common in endurance fuel, but dextrose is easier for a simple DIY hydration recipe because it
+        directly gives you glucose.
+      </p>
+    </section>
+
+    <section>
+      <h2>Why sodium citrate and salt?</h2>
+      <p>
+        Salt gives you sodium chloride. Sodium citrate gives you sodium in a form many athletes find gentler than a very
+        salty drink.
+      </p>
+      <p>Using both gives a better taste and a smoother drink than using only table salt.</p>
+      <p>
+        If you only have salt, you can still make a useful drink. But sodium citrate makes the formula easier to drink,
+        especially when the sodium level is high.
+      </p>
+    </section>
+
+    <section>
+      <h2>What about magnesium?</h2>
+      <p>
+        Magnesium matters for general health, but it is not the main electrolyte lost in sweat. For most athletes, the
+        bottle should focus on sodium, fluid, and a small amount of carbohydrate.
+      </p>
+      <p>If you already take magnesium at night, you probably do not need to add it to this drink.</p>
+      <p>If you do add magnesium, keep the dose small. Too much magnesium in a sports drink can upset the gut.</p>
+    </section>
+
+    <section>
+      <h2>Natural flavour options</h2>
+      <p>The best flavour is the one that makes you drink enough without making the bottle sickly sweet.</p>
+      <ul>
+        <li>lemon juice</li>
+        <li>lime juice</li>
+        <li>orange juice</li>
+        <li>ginger infusion</li>
+        <li>mint infusion</li>
+        <li>hibiscus tea</li>
+        <li>freeze-dried lemon, lime, orange, raspberry, or strawberry powder</li>
+        <li>unsweetened coconut water powder</li>
+      </ul>
+      <p>Use flavour lightly. The goal is a drink you can finish during or after training.</p>
+    </section>
+
+    <section>
+      <h2>How to adjust the recipe</h2>
+      <p>Use your bodyweight, sweat rate, and stomach as feedback.</p>
+      <div class="adjust-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px;">
+        <div class="fuel-card" style="padding:18px;">
+          <h3 style="margin-top:0;">Make it stronger if:</h3>
+          <ul>
+            <li>you finish covered in salt marks</li>
+            <li>your sweat stings your eyes</li>
+            <li>you feel flat after hot or indoor sessions</li>
+            <li>you lose a lot of bodyweight during training</li>
+            <li>plain water is not enough during long sessions</li>
+          </ul>
+        </div>
+        <div class="fuel-card" style="padding:18px;">
+          <h3 style="margin-top:0;">Make it weaker if:</h3>
+          <ul>
+            <li>the drink tastes too salty</li>
+            <li>you feel bloated</li>
+            <li>your stomach feels heavy</li>
+            <li>you are taking gels at the same time</li>
+            <li>the session is short, cool, or low-sweat</li>
+          </ul>
+        </div>
+      </div>
+      <p>
+        A useful test is to weigh yourself before and after a session. If you lose 1 kg, that is roughly 1 litre of
+        fluid lost. You do not need to replace all of it during the session, but it tells you whether you are a light,
+        medium, or heavy sweater.
+      </p>
+    </section>
+
+    <section>
+      <h2>HYROX-specific use</h2>
+      <p>
+        HYROX is awkward for mid-race drinking because the race is intense, the stations spike heart rate, and the gut
+        can feel unstable.
+      </p>
+      <p>For many HYROX athletes, the better strategy is:</p>
+      <ul>
+        <li>arrive well hydrated</li>
+        <li>drink your electrolyte mix before the race</li>
+        <li>avoid overloading the stomach during the race</li>
+        <li>use small sips only if needed</li>
+        <li>recover with a stronger bottle afterwards</li>
+      </ul>
+      <p>
+        If your expected HYROX time is around 60-90 minutes, you may not need much mid-race fuel. The bigger win is
+        usually the day-before routine, the race-morning meal, and starting the race topped up.
+      </p>
+      <p>
+        For more race-specific context, see the <a href="/hyrox-gel-guide/">HYROX fuelling guide</a>, the
+        <a href="/marathon-gel-guide/">marathon fuelling guide</a>, the
+        <a href="/running-gel-cost-calculator/">race fuel cost calculator</a>, and the
+        <a href="/ai-race-fuel-prompt-generator/">AI race fuel prompt generator</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Safety notes</h2>
+      <p>
+        Do not use potassium chloride casually. It is a concentrated potassium source. Avoid it unless cleared by a
+        clinician if you have kidney disease, heart disease, diabetes, high blood pressure, or you take ACE inhibitors,
+        ARBs, potassium-sparing diuretics, or other medication that affects potassium.
+      </p>
+      <p>Do not overdrink. Drinking too much plain water or too much electrolyte drink can both cause problems.</p>
+      <p>
+        Stop and seek medical help if you have confusion, fainting, chest pain, severe weakness, repeated vomiting,
+        swelling, or symptoms that feel unusual for you.
+      </p>
+      <p>Keep dry powders away from children and pets.</p>
+      <p>Read the full <a href="/disclaimer/">site disclaimer</a> before changing your fuelling plan.</p>
+    </section>
+
+    <section>
+      <h2>Bottom line</h2>
+      <p>A good DIY electrolyte drink does not need to be complicated.</p>
+      <p>For most training, start with the everyday 1-litre recipe.</p>
+      <p>
+        For heavy sweat, warm indoor training, long runs, or post-session recovery, use the stronger 750 ml
+        heavy-sweater mix.
+      </p>
+      <p><strong>Test everything in training before using it on race day.</strong></p>
+    </section>
+
+    <section>
+      <h2>FAQ</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+        {faqs.map((faq) => (
+          <details class="fuel-card" style="padding:16px 18px;">
+            <summary style="cursor:pointer;font-family:var(--font-sans);font-weight:800;">{faq.question}</summary>
+            <p style="color:var(--color-text-muted);line-height:1.65;margin:10px 0 0;">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  main :global(section) {
+    margin-top: 42px;
+  }
+
+  main :global(h2) {
+    font-family: var(--font-sans);
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  main :global(h3) {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 24px 0 0;
+  }
+
+  main :global(p),
+  main :global(li) {
+    color: var(--color-text-muted);
+    line-height: 1.72;
+  }
+
+  main :global(p) {
+    margin: 12px 0 0;
+  }
+
+  main :global(ul) {
+    margin: 10px 0 0;
+    padding-left: 22px;
+  }
+
+  main :global(a) {
+    color: var(--color-accent);
+    font-weight: 800;
+  }
+
+  @media (max-width: 760px) {
+    .adjust-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
