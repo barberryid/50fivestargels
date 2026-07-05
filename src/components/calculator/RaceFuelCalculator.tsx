@@ -545,7 +545,9 @@ export default function RaceFuelCalculator() {
             {meta.eyebrow}
           </span>
         </div>
-        <h1 className="m-0 text-[26px] leading-[1.05] lg:text-[32px]">{meta.title}</h1>
+        <h2 className="m-0 text-[26px] uppercase leading-[1.05] lg:text-[32px]" style={{ letterSpacing: '-0.01em' }}>
+          {meta.title}
+        </h2>
         <p className="mb-3 mt-2 text-[13.5px] leading-[1.5] text-text-muted lg:text-[15px]">{meta.sub}</p>
 
         {step === 1 && (

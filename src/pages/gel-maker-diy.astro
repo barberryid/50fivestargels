@@ -5,7 +5,7 @@ import { webApplicationJsonLd, webPageJsonLd } from '../lib/seo';
 
 const title = 'Gel Maker DIY — DIY race mix vs gels, priced per gram of carb';
 const description =
-  'Work out a DIY bottle mix or soft-flask syrup for marathon, half marathon, HYROX or long training — with cost per gram of carbohydrate, a training-block savings estimate and an honest gut-load warning.';
+  'DIY bottle mix or soft-flask syrup for marathon, half marathon, HYROX or long training — cost per gram of carb, savings vs gels, and an honest gut-load warning.';
 
 const trustBlocks = [
   {
@@ -32,6 +32,9 @@ const trustBlocks = [
     webPageJsonLd({ title, description, path: '/gel-maker-diy/' }),
   ]}
 >
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
+    {title}
+  </h1>
   <RaceFuelCalculator client:load />
 
   <main style="max-width:1080px;margin:0 auto;padding:0 20px clamp(32px,5vw,56px);">

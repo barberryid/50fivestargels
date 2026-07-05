@@ -3,9 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PromptGenerator from '../components/promptgen/PromptGenerator';
 import { webPageJsonLd, canonicalUrl } from '../lib/seo';
 
-const title = 'AI Race Fuel Prompt Generator - personalised fuelling prompts for any AI assistant';
+const title = 'AI Race Fuel Prompt Generator — personalised fuelling prompts';
 const description =
-  'Answer a short tactile questionnaire and get a copy-paste prompt for Claude, ChatGPT or any AI assistant - find gels in your country, compare commercial vs DIY, or build a marathon or HYROX fuelling plan.';
+  'Get a copy-paste prompt for Claude, ChatGPT or any AI assistant — find gels in your country, compare DIY vs commercial, or build a race fuelling plan.';
 
 const webAppJsonLd = {
   '@context': 'https://schema.org',
@@ -25,5 +25,8 @@ const webAppJsonLd = {
   canonical="/ai-race-fuel-prompt-generator/"
   jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/ai-race-fuel-prompt-generator/' })]}
 >
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
+    {title}
+  </h1>
   <PromptGenerator client:load />
 </BaseLayout>

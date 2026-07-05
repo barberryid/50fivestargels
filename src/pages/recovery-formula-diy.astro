@@ -4,9 +4,9 @@ import RecoveryDrinkBuilder from '../components/recoverybuilder/RecoveryDrinkBui
 import { webPageJsonLd, canonicalUrl } from '../lib/seo';
 import { AVAILABILITY_NOTES, RECOVERY_PRODUCTS, RECOVERY_VERDICTS } from '../data/recoveryData';
 
-const title = 'Recovery Formula DIY — DIY recipe + store-bought comparison | 50FiveStarGels';
+const title = 'Recovery Formula DIY — DIY recipe + store-bought comparison';
 const description =
-  'Build a personalised DIY recovery drink from your bodyweight and session type — carbs, protein, sodium and cost, live — then compare it against seven verified commercial recovery mixes.';
+  'Build a personalised DIY recovery drink from your bodyweight and session type — carbs, protein, sodium and cost, live, compared against seven verified commercial mixes.';
 
 const webAppJsonLd = {
   '@context': 'https://schema.org',
@@ -41,6 +41,9 @@ const steps = [
   canonical="/recovery-formula-diy/"
   jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/recovery-formula-diy/' })]}
 >
+  <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
+    {title}
+  </h1>
   <RecoveryDrinkBuilder client:load />
 
   <main style="max-width:1280px;margin:0 auto;padding:0 clamp(1rem,4vw,3rem) clamp(32px,5vw,56px);">
