@@ -29,6 +29,9 @@ const fuelingLinks = [
   { label: 'HYROX fuelling guide', href: '/hyrox-gel-guide/' },
   { label: 'Commercial gel comparison', href: '/gel-maker-diy/?mode=commercial' },
 ];
+
+// The hero nav shows only the three DIY pillars; the "Get fueling" section shows everything.
+const heroNavLinks = fuelingLinks.slice(0, 3);
 ---
 
 <BaseLayout
@@ -48,7 +51,7 @@ const fuelingLinks = [
         </div>
         <nav class="home-hero-nav" style="display:flex;align-items:center;flex-wrap:wrap;gap:20px 28px;padding-top:10px;">
           {
-            fuelingLinks.map((link) => (
+            heroNavLinks.map((link) => (
               <a
                 href={link.href}
                 class="gel-nav-link"
