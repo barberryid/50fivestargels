@@ -24,8 +24,24 @@ const { title, description, canonical, image, type, noindex, jsonLd, imageAlt, c
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- TODO: add analytics once a GA/Plausible property exists for this site
-         (mirror the production-hostname guard used in 50fivestarhotels). -->
+    <!-- Google tag (gtag.js) - production hostnames only -->
+    <script is:inline>
+      if (
+        window.location.hostname === '50fivestargels.com' ||
+        window.location.hostname === 'www.50fivestargels.com'
+      ) {
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-H6E8CEX8J3';
+        document.head.appendChild(gaScript);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ window.dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-H6E8CEX8J3');
+      }
+    </script>
     <SeoHead
       title={title}
       description={description}
