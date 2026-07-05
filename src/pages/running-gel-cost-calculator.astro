@@ -32,16 +32,9 @@ const trustBlocks = [
     webPageJsonLd({ title, description, path: '/running-gel-cost-calculator/' }),
   ]}
 >
-  <main style="max-width:1080px;margin:0 auto;padding:clamp(32px,5vw,56px) 20px 20px;">
-    <p class="fuel-eyebrow">Free tool · no sign-up</p>
-    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.05;margin:10px 0 0;">Race Fuel Cost Calculator</h1>
-    <p style="max-width:64ch;color:var(--color-text-muted);line-height:1.65;margin:16px 0 0;">
-      Should you buy gels, make your own mix, or use both? Pick a race preset or set your own session, and get a
-      gram-accurate recipe, its cost per gram of carbohydrate, and what a full training block would save you.
-    </p>
+  <RaceFuelCalculator client:load />
 
-    <RaceFuelCalculator client:load />
-
+  <main style="max-width:1080px;margin:0 auto;padding:0 20px clamp(32px,5vw,56px);">
     <section style="margin-top:40px;">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
         {

@@ -1,6 +1,9 @@
 // Race Fuel Cost Calculator — the only React island on the site (brief §10).
 // All maths lives in src/lib/fuelMath.ts; this file is state + presentation.
-import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
+// Presentation follows the tactile step-by-step flow introduced for the AI
+// Race Fuel Prompt Generator (dark live-value card, big tappable rows,
+// numeric keypad) so the two islands share one interaction language.
+import { useEffect, useMemo, useState } from 'react';
 import {
   BOTTLE_SIZES_ML,
   DEFAULT_PRICES,
@@ -40,9 +43,22 @@ import {
   weightBounds,
   weightToKg,
   weightUnit as weightUnitFor,
+  type UnitSystem,
 } from '../../lib/units';
 
 type Mode = 'bottle' | 'syrup' | 'commercial';
+type Step = 1 | 2 | 3;
+type Phase =
+  | 'duration'
+  | 'bodyweight'
+  | 'carbs'
+  | 'sweat'
+  | 'ratio'
+  | 'sodium'
+  | 'bottle'
+  | 'flaskSize'
+  | 'flaskCount'
+  | 'region';
 
 interface CalcState {
   mode: Mode;
@@ -108,6 +124,51 @@ const CARBS_PRESETS = [
   { value: 90, label: 'Trained gut' },
 ] as const;
 
+const MODE_CARDS: Array<{ key: Mode; title: string; desc: string }> = [
+  {
+    key: 'bottle',
+    title: 'DIY bottle mix',
+    desc: 'Maltodextrin, fructose and sodium mixed into your drink bottle — the standard setup for most sessions.',
+  },
+  {
+    key: 'syrup',
+    title: 'DIY soft-flask syrup',
+    desc: 'A concentrated carb syrup sipped and chased with plain water — less volume to carry.',
+  },
+  {
+    key: 'commercial',
+    title: 'Commercial gel comparison',
+    desc: 'See how your DIY recipe stacks up against real gels available in your region.',
+  },
+];
+
+const STEP_META: Record<Step, { eyebrow: string; title: string; sub: string }> = {
+  1: {
+    eyebrow: 'STEP 1 · WHAT ARE YOU FUELLING?',
+    title: 'Pick your approach',
+    sub: 'DIY bottle, DIY syrup, or a straight commercial-gel comparison.',
+  },
+  2: {
+    eyebrow: 'STEP 2 · YOU AND YOUR SESSION',
+    title: 'Type your numbers',
+    sub: 'Big keys, no keyboard. Tap any row above to jump straight to it.',
+  },
+  3: {
+    eyebrow: 'STEP 3 · YOUR RESULTS',
+    title: 'Recipe, cost and savings',
+    sub: 'Everything below updates with your answers — go back to adjust anything.',
+  },
+};
+
+function phasesForMode(mode: Mode): Phase[] {
+  const base: Phase[] = ['duration', 'bodyweight', 'carbs', 'sweat', 'ratio', 'sodium'];
+  if (mode === 'bottle') return [...base, 'bottle'];
+  if (mode === 'syrup') return [...base, 'flaskSize', 'flaskCount'];
+  return [...base, 'region'];
+}
+
+const numericPhases: Phase[] = ['duration', 'bodyweight', 'carbs'];
+
 const num = (v: string | null): number | null => {
   if (v === null || v.trim() === '') return null;
   const n = Number(v);
@@ -116,15 +177,11 @@ const num = (v: string | null): number | null => {
 
 // Number inputs: don't clamp min/max on every keystroke (it fights typing —
 // e.g. a min of 20 would snap "7" up to "20" before the user can type the
-// second digit of "75"). Parse loosely as the user types, clamp on blur.
+// second digit of "75"). Parse loosely as the user types, clamp on commit.
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-const blockNonDigitKeys = (e: KeyboardEvent<HTMLInputElement>) => {
-  if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
-};
-
-// Bottle/flask sizes come from <select>s, so URL params must land on an
-// actual option or the select renders out of sync with the recipe.
+// Bottle/flask sizes come from option lists, so URL params must land on an
+// actual option or the recipe renders out of sync with the displayed value.
 const nearestSize = (value: number, sizes: readonly number[]): number =>
   sizes.reduce((best, size) => (Math.abs(size - value) < Math.abs(best - value) ? size : best));
 
@@ -190,14 +247,80 @@ function buildParams(s: CalcState, carbsPerHour: number): string {
 }
 
 const labelCls = 'block font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-text-muted mb-1';
-const inputCls =
-  'w-full rounded-lg border border-border bg-white px-3 py-2 font-sans text-sm text-text';
+const inputCls = 'w-full rounded-lg border border-border bg-white px-3 py-2 font-sans text-sm text-text';
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(' ');
 const chipCls = (active: boolean) =>
-  `rounded-full border px-3.5 py-2 font-sans text-[13px] font-bold transition-colors ${
-    active
-      ? 'border-accent bg-accent text-white'
-      : 'border-border bg-white text-text-muted hover:border-accent-deep hover:text-text'
+  `rounded-full border px-3.5 py-2 font-sans text-[13px] font-bold transition-colors duration-150 hover:border-accent ${
+    active ? 'border-accent bg-accent text-bg' : 'border-border bg-white text-accent-deep'
   }`;
+
+function fieldMeta(
+  phase: Phase,
+  state: CalcState,
+  unitSystem: UnitSystem,
+  carbsPerHour: number
+): { label: string; unit: string; value: string } {
+  switch (phase) {
+    case 'duration':
+      return { label: 'Expected duration', unit: 'min', value: String(state.durationMin) };
+    case 'bodyweight':
+      return {
+        label: 'Bodyweight',
+        unit: weightUnitFor(unitSystem),
+        value: String(Math.round(displayWeight(state.weightKg, unitSystem))),
+      };
+    case 'carbs':
+      return { label: 'Target carbs', unit: 'g/h', value: String(carbsPerHour) };
+    case 'sweat':
+      return { label: 'Sweat level', unit: '', value: state.sweat[0].toUpperCase() + state.sweat.slice(1) };
+    case 'ratio':
+      return { label: 'Carb ratio', unit: '', value: RATIOS[state.ratio].label };
+    case 'sodium':
+      return { label: 'Sodium source', unit: '', value: SODIUM_FORMS[state.sodiumForm].label };
+    case 'bottle':
+      return { label: 'Bottle size', unit: '', value: volumeLabel(state.bottleMl, unitSystem) };
+    case 'flaskSize':
+      return { label: 'Flask size', unit: '', value: volumeLabel(state.flaskMl, unitSystem) };
+    case 'flaskCount':
+      return { label: 'Flasks carried', unit: '', value: String(state.flaskCount) };
+    case 'region':
+      return { label: 'Where you shop', unit: '', value: REGION_LABELS[state.region] };
+  }
+}
+
+function optionsFor(
+  phase: Phase,
+  unitSystem: UnitSystem
+): Array<{ key: string; label: string; desc?: string }> {
+  switch (phase) {
+    case 'sweat':
+      return [
+        { key: 'low', label: 'Low', desc: `${SODIUM_BY_SWEAT.low} mg sodium/h` },
+        { key: 'medium', label: 'Medium', desc: `${SODIUM_BY_SWEAT.medium} mg sodium/h` },
+        { key: 'high', label: 'High / hot', desc: `${SODIUM_BY_SWEAT.high} mg sodium/h` },
+      ];
+    case 'ratio':
+      return [
+        { key: 'simple', label: `${RATIOS.simple.label} malto:fructose`, desc: RATIOS.simple.note },
+        { key: 'advanced', label: `${RATIOS.advanced.label} malto:fructose`, desc: RATIOS.advanced.note },
+      ];
+    case 'sodium':
+      return [
+        { key: 'salt', label: SODIUM_FORMS.salt.label, desc: SODIUM_FORMS.salt.note },
+        { key: 'citrate', label: SODIUM_FORMS.citrate.label, desc: SODIUM_FORMS.citrate.note },
+      ];
+    case 'bottle':
+      return BOTTLE_SIZES_ML.map((ml) => ({ key: String(ml), label: volumeLabel(ml, unitSystem) }));
+    case 'flaskSize':
+      return FLASK_SIZES_ML.map((ml) => ({ key: String(ml), label: volumeLabel(ml, unitSystem) }));
+    case 'flaskCount':
+      return Array.from({ length: 8 }, (_, i) => ({ key: String(i + 1), label: String(i + 1) }));
+    case 'region':
+      return (Object.keys(REGION_LABELS) as Region[]).map((r) => ({ key: r, label: REGION_LABELS[r] }));
+    default:
+      return [];
+  }
+}
 
 export default function RaceFuelCalculator() {
   const [state, setState] = useState<CalcState>(INITIAL);
@@ -205,14 +328,23 @@ export default function RaceFuelCalculator() {
   const [copied, setCopied] = useState(false);
   const [showCarbsHelp, setShowCarbsHelp] = useState(false);
   const [unitSystem, setUnitSystem] = useUnitSystem();
+  const [step, setStep] = useState<Step>(1);
+  const [phase, setPhase] = useState<Phase>('duration');
+  const [durationBuf, setDurationBuf] = useState('');
+  const [bodyweightBuf, setBodyweightBuf] = useState('');
+  const [carbsBuf, setCarbsBuf] = useState('');
+
   const weightUnit = weightUnitFor(unitSystem);
   const weightBoundsDisplay = weightBounds(unitSystem);
   const patch = (p: Partial<CalcState>) => setState((s) => ({ ...s, ...p }));
-  const patchPrices = (p: Partial<Prices>) =>
-    setState((s) => ({ ...s, prices: { ...s.prices, ...p } }));
+  const patchPrices = (p: Partial<Prices>) => setState((s) => ({ ...s, prices: { ...s.prices, ...p } }));
+
+  const phaseList = useMemo(() => phasesForMode(state.mode), [state.mode]);
 
   useEffect(() => {
-    setState((s) => ({ ...s, ...parseParams(window.location.search) }));
+    const parsed = parseParams(window.location.search);
+    setState((s) => ({ ...s, ...parsed }));
+    if (Object.keys(parsed).length > 0) setStep(3);
     setReady(true);
   }, []);
 
@@ -296,613 +428,687 @@ export default function RaceFuelCalculator() {
     /* if both copy paths fail, the URL bar already has the params */
   };
 
+  const advance = () => {
+    const idx = phaseList.indexOf(phase);
+    const next = phaseList[idx + 1];
+    if (next) setPhase(next);
+    else setStep(3);
+  };
+
+  const back = () => {
+    if (step === 3) {
+      setStep(2);
+      setPhase(phaseList[phaseList.length - 1]);
+      return;
+    }
+    if (step === 2) {
+      const idx = phaseList.indexOf(phase);
+      if (idx > 0) setPhase(phaseList[idx - 1]);
+      else setStep(1);
+    }
+  };
+
+  const selectOption = (key: string) => {
+    switch (phase) {
+      case 'sweat':
+        patch({ sweat: key as SweatLevel });
+        break;
+      case 'ratio':
+        patch({ ratio: key as RatioKey });
+        break;
+      case 'sodium':
+        patch({ sodiumForm: key as SodiumForm });
+        break;
+      case 'bottle':
+        patch({ bottleMl: Number(key) });
+        break;
+      case 'flaskSize':
+        patch({ flaskMl: Number(key) });
+        break;
+      case 'flaskCount':
+        patch({ flaskCount: Number(key) });
+        break;
+      case 'region':
+        patch({ region: key as Region });
+        break;
+    }
+    setCopied(false);
+    advance();
+  };
+
+  const tapDigit = (digit: string) => {
+    if (phase === 'duration') setDurationBuf((b) => (b + digit).replace(/^0+(?=\d)/, '').slice(0, 4));
+    else if (phase === 'bodyweight') setBodyweightBuf((b) => (b + digit).replace(/^0+(?=\d)/, '').slice(0, 3));
+    else if (phase === 'carbs') setCarbsBuf((b) => (b + digit).replace(/^0+(?=\d)/, '').slice(0, 3));
+    setCopied(false);
+  };
+
+  const tapBackspace = () => {
+    if (phase === 'duration') setDurationBuf((b) => b.slice(0, -1));
+    else if (phase === 'bodyweight') setBodyweightBuf((b) => b.slice(0, -1));
+    else if (phase === 'carbs') setCarbsBuf((b) => b.slice(0, -1));
+  };
+
+  const commitNumeric = () => {
+    if (phase === 'duration') {
+      if (durationBuf !== '') patch({ sport: 'custom', durationMin: clamp(Number(durationBuf) || 20, 20, 1440) });
+      setDurationBuf('');
+    } else if (phase === 'bodyweight') {
+      if (bodyweightBuf !== '') {
+        const raw = clamp(Number(bodyweightBuf) || weightBoundsDisplay.min, weightBoundsDisplay.min, weightBoundsDisplay.max);
+        patch({ weightKg: weightToKg(raw, unitSystem) });
+      }
+      setBodyweightBuf('');
+    } else if (phase === 'carbs') {
+      if (carbsBuf !== '') patch({ carbsOverride: clamp(Number(carbsBuf) || 10, 10, 150) });
+      setCarbsBuf('');
+    }
+    advance();
+  };
+
+  const numericValue = (p: Extract<Phase, 'duration' | 'bodyweight' | 'carbs'>): string => {
+    if (p === 'duration') return durationBuf !== '' ? durationBuf : String(state.durationMin);
+    if (p === 'bodyweight') return bodyweightBuf !== '' ? bodyweightBuf : String(Math.round(displayWeight(state.weightKg, unitSystem)));
+    return carbsBuf !== '' ? carbsBuf : String(carbsPerHour);
+  };
+
+  const meta = STEP_META[step];
+  const isNumericPhase = numericPhases.includes(phase);
+
   return (
-    <div className="fuel-card mt-8 p-5 sm:p-7">
-      <UnitToggle value={unitSystem} onChange={setUnitSystem} />
-      {/* Mode switcher — toggle buttons, not ARIA tabs (no tabpanel/arrow-key wiring) */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Calculator mode">
-        <button
-          type="button"
-          aria-pressed={state.mode === 'bottle'}
-          className={chipCls(state.mode === 'bottle')}
-          onClick={() => patch({ mode: 'bottle' })}
-        >
-          DIY bottle mix
-        </button>
-        <button
-          type="button"
-          aria-pressed={state.mode === 'syrup'}
-          className={chipCls(state.mode === 'syrup')}
-          onClick={() => patch({ mode: 'syrup' })}
-        >
-          DIY soft-flask syrup
-        </button>
-        <button
-          type="button"
-          aria-pressed={state.mode === 'commercial'}
-          className={chipCls(state.mode === 'commercial')}
-          onClick={() => patch({ mode: 'commercial' })}
-        >
-          Commercial gel comparison
-        </button>
-      </div>
+    <div className="bg-bg px-4 py-6 text-text font-body sm:px-6 lg:flex lg:justify-center lg:px-10 lg:py-14">
+      <style>{`
+        @keyframes rf-caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+      `}</style>
+      <div
+        className={cx(
+          'mx-auto flex w-full max-w-[390px] flex-col lg:rounded-2xl lg:border lg:border-border lg:bg-bg-card lg:px-9 lg:py-9 lg:shadow-[0_10px_30px_rgba(0,0,0,0.08)]',
+          step === 3 ? 'lg:max-w-[920px]' : 'lg:max-w-[480px]'
+        )}
+      >
+        <div className="mb-3">
+          <UnitToggle value={unitSystem} onChange={setUnitSystem} />
+        </div>
 
-      {/* Presets */}
-      <div className="mt-5">
-        <span className={labelCls}>Race / session preset</span>
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(SPORT_PRESETS) as Array<keyof typeof SPORT_PRESETS>).map((key) => (
+        <div className="mb-1 flex items-center gap-2.5">
+          {step > 1 && (
             <button
-              key={key}
               type="button"
-              className={chipCls(state.sport === key)}
-              onClick={() =>
-                patch({ sport: key, durationMin: SPORT_PRESETS[key].durationMin, carbsOverride: null })
-              }
+              aria-label="Back"
+              onClick={back}
+              className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
             >
-              {SPORT_PRESETS[key].label}
+              ←
             </button>
-          ))}
-          <button type="button" className={chipCls(state.sport === 'custom')} onClick={() => patch({ sport: 'custom' })}>
-            Custom
-          </button>
+          )}
+          <span className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-accent">
+            {meta.eyebrow}
+          </span>
         </div>
-      </div>
+        <h1 className="m-0 text-[26px] leading-[1.05] lg:text-[32px]">{meta.title}</h1>
+        <p className="mb-3 mt-2 text-[13.5px] leading-[1.5] text-text-muted lg:text-[15px]">{meta.sub}</p>
 
-      {/* Inputs */}
-      <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div>
-          <label className={labelCls} htmlFor="rf-duration">
-            {state.sport === 'hyrox' ? 'Expected finish (min)' : 'Duration (min)'}
-          </label>
-          <input
-            id="rf-duration"
-            type="number"
-            min="20"
-            max="1440"
-            className={inputCls}
-            value={state.durationMin}
-            onKeyDown={blockNonDigitKeys}
-            onChange={(e) => {
-              const raw = Number(e.target.value);
-              patch({ sport: 'custom', durationMin: Number.isFinite(raw) ? raw : 0 });
-            }}
-            onBlur={(e) => patch({ durationMin: clamp(Number(e.target.value) || 20, 20, 1440) })}
-          />
-        </div>
-        <div className="col-span-2 md:col-span-1">
-          <label className={labelCls} htmlFor="rf-carbs">
-            Carbs g/hour
-          </label>
-          <div className="mb-2 flex flex-wrap gap-2">
-            {CARBS_PRESETS.map((p) => (
+        {step === 1 && (
+          <div className="flex flex-col gap-2">
+            {MODE_CARDS.map((item) => (
               <button
-                key={p.value}
+                key={item.key}
                 type="button"
-                aria-pressed={carbsPerHour === p.value}
-                className={chipCls(carbsPerHour === p.value)}
-                onClick={() => patch({ carbsOverride: p.value })}
+                className="flex min-h-[60px] flex-col gap-[3px] rounded-[14px] border border-border bg-white px-3.5 py-3 text-left transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
+                onClick={() => {
+                  patch({ mode: item.key });
+                  setStep(2);
+                  setPhase('duration');
+                  setCopied(false);
+                }}
               >
-                {p.label} · {p.value}
+                <span className="font-sans text-[14.5px] font-semibold leading-tight text-text">{item.title}</span>
+                <span className="text-[12.5px] leading-[1.45] text-text-muted">{item.desc}</span>
               </button>
             ))}
           </div>
-          <input
-            id="rf-carbs"
-            type="number"
-            min="10"
-            max="150"
-            className={inputCls}
-            value={carbsPerHour}
-            onKeyDown={blockNonDigitKeys}
-            onChange={(e) => {
-              const raw = Number(e.target.value);
-              patch({ carbsOverride: Number.isFinite(raw) ? raw : 0 });
-            }}
-            onBlur={(e) => patch({ carbsOverride: clamp(Number(e.target.value) || 10, 10, 150) })}
-            aria-describedby={`rf-carbs-help${carbsWarning ? ' rf-carbs-warning' : ''}`}
-          />
-          <p id="rf-carbs-help" className="mt-1 font-sans text-[11px] text-text-muted">
-            Most runners handle 45–60 g/h. Above 90 g/h needs practice in training.{' '}
-            <button
-              type="button"
-              aria-expanded={showCarbsHelp}
-              onClick={() => setShowCarbsHelp((v) => !v)}
-              className="cursor-pointer border-0 bg-transparent p-0 font-sans text-[11px] font-bold text-accent underline underline-offset-2"
-            >
-              How do I choose?
-            </button>
-          </p>
-          {showCarbsHelp && (
-            <ul className="m-0 mt-1 list-disc space-y-0.5 pl-4 font-sans text-[11px] text-text-muted">
-              <li>Under ~2.5 h: 30–60 g/h is plenty.</li>
-              <li>Marathon and longer: 60–90 g/h.</li>
-              <li>90–120 g/h: only if you've practiced high intake repeatedly in training.</li>
-            </ul>
-          )}
-          {carbsWarning && (
-            <p
-              id="rf-carbs-warning"
-              className={`mt-1 font-sans text-[11px] leading-relaxed ${
-                carbsWarning.tone === 'amber'
-                  ? 'rounded-md border border-amber bg-amber-soft px-2 py-1 text-amber'
-                  : 'text-text-muted'
-              }`}
-            >
-              {carbsWarning.text}
-            </p>
-          )}
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="rf-weight">
-            Bodyweight ({weightUnit})
-          </label>
-          <input
-            id="rf-weight"
-            type="number"
-            min={weightBoundsDisplay.min}
-            max={weightBoundsDisplay.max}
-            className={inputCls}
-            value={Math.round(displayWeight(state.weightKg, unitSystem))}
-            onKeyDown={blockNonDigitKeys}
-            onChange={(e) => {
-              const raw = Number(e.target.value);
-              patch({ weightKg: Number.isFinite(raw) ? weightToKg(raw, unitSystem) : 0 });
-            }}
-            onBlur={(e) => {
-              const raw = clamp(Number(e.target.value) || weightBoundsDisplay.min, weightBoundsDisplay.min, weightBoundsDisplay.max);
-              patch({ weightKg: weightToKg(raw, unitSystem) });
-            }}
-          />
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="rf-sweat">
-            Sweat level
-          </label>
-          <select
-            id="rf-sweat"
-            className={inputCls}
-            value={state.sweat}
-            onChange={(e) => patch({ sweat: e.target.value as SweatLevel })}
-          >
-            <option value="low">Low — {SODIUM_BY_SWEAT.low} mg sodium/h</option>
-            <option value="medium">Medium — {SODIUM_BY_SWEAT.medium} mg/h</option>
-            <option value="high">High / hot — {SODIUM_BY_SWEAT.high} mg/h</option>
-          </select>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="rf-ratio">
-            Carb ratio
-          </label>
-          <select
-            id="rf-ratio"
-            className={inputCls}
-            value={state.ratio}
-            onChange={(e) => patch({ ratio: e.target.value as RatioKey })}
-          >
-            <option value="simple">{RATIOS.simple.label} malto:fructose</option>
-            <option value="advanced">{RATIOS.advanced.label} — gut-trained</option>
-          </select>
-          <p className="mt-1 font-sans text-[11px] text-text-muted">{RATIOS[state.ratio].note}</p>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="rf-sodium">
-            Sodium source
-          </label>
-          <select
-            id="rf-sodium"
-            className={inputCls}
-            value={state.sodiumForm}
-            onChange={(e) => patch({ sodiumForm: e.target.value as SodiumForm })}
-          >
-            <option value="salt">{SODIUM_FORMS.salt.label}</option>
-            <option value="citrate">{SODIUM_FORMS.citrate.label}</option>
-          </select>
-          <p className="mt-1 font-sans text-[11px] text-text-muted">{SODIUM_FORMS[state.sodiumForm].note}</p>
-        </div>
-        {state.mode === 'bottle' ? (
-          <div>
-            {/* container pickers hidden in commercial mode */}
-            <label className={labelCls} htmlFor="rf-bottle">
-              Bottle size
-            </label>
-            <select
-              id="rf-bottle"
-              className={inputCls}
-              value={state.bottleMl}
-              onChange={(e) => patch({ bottleMl: Number(e.target.value) })}
-            >
-              {BOTTLE_SIZES_ML.map((ml) => (
-                <option key={ml} value={ml}>
-                  {volumeLabel(ml, unitSystem)}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : state.mode === 'syrup' ? (
+        )}
+
+        {step === 2 && (
           <>
-            <div>
-              <label className={labelCls} htmlFor="rf-flask">
-                Soft-flask size
-              </label>
-              <select
-                id="rf-flask"
-                className={inputCls}
-                value={state.flaskMl}
-                onChange={(e) => patch({ flaskMl: Number(e.target.value) })}
-              >
-                {FLASK_SIZES_ML.map((ml) => (
-                  <option key={ml} value={ml}>
-                    {volumeLabel(ml, unitSystem)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls} htmlFor="rf-flasks">
-                Flasks carried
-              </label>
-              <input
-                id="rf-flasks"
-                type="number"
-                min="1"
-                max="8"
-                className={inputCls}
-                value={state.flaskCount}
-                onKeyDown={blockNonDigitKeys}
-                onChange={(e) => {
-                  const raw = Number(e.target.value);
-                  patch({ flaskCount: Number.isFinite(raw) ? raw : 0 });
-                }}
-                onBlur={(e) => patch({ flaskCount: clamp(Math.round(Number(e.target.value) || 1), 1, 8) })}
-              />
-            </div>
-          </>
-        ) : (
-          <div>
-            <label className={labelCls} htmlFor="rf-region">
-              Where do you shop?
-            </label>
-            <select
-              id="rf-region"
-              className={inputCls}
-              value={state.region}
-              onChange={(e) => patch({ region: e.target.value as Region })}
-            >
-              {(Object.keys(REGION_LABELS) as Region[]).map((r) => (
-                <option key={r} value={r}>
-                  {REGION_LABELS[r]}
-                </option>
+            <div className="mb-2.5 flex flex-wrap gap-1.5">
+              {(Object.keys(SPORT_PRESETS) as Array<keyof typeof SPORT_PRESETS>).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={state.sport === key}
+                  className={chipCls(state.sport === key)}
+                  onClick={() => {
+                    patch({ sport: key, durationMin: SPORT_PRESETS[key].durationMin, carbsOverride: null });
+                    setDurationBuf('');
+                    setCarbsBuf('');
+                    setPhase('bodyweight');
+                    setCopied(false);
+                  }}
+                >
+                  {SPORT_PRESETS[key].label}
+                </button>
               ))}
-            </select>
+              <button
+                type="button"
+                aria-pressed={state.sport === 'custom'}
+                className={chipCls(state.sport === 'custom')}
+                onClick={() => {
+                  patch({ sport: 'custom' });
+                  setPhase('duration');
+                  setCopied(false);
+                }}
+              >
+                Custom
+              </button>
+            </div>
+
+            <div className="mb-3 flex flex-col gap-[7px] rounded-2xl bg-text px-4 py-3">
+              {phaseList.map((p) => {
+                const active = phase === p;
+                const info = fieldMeta(p, state, unitSystem, carbsPerHour);
+                const displayValue = numericPhases.includes(p)
+                  ? numericValue(p as Extract<Phase, 'duration' | 'bodyweight' | 'carbs'>)
+                  : info.value;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    className="flex cursor-pointer items-baseline justify-between gap-3 border-0 bg-transparent p-0 text-left"
+                    onClick={() => setPhase(p)}
+                  >
+                    <span
+                      className={cx(
+                        'font-sans text-[9.5px] font-extrabold uppercase tracking-[0.18em]',
+                        active ? 'text-amber' : 'text-bg/50'
+                      )}
+                    >
+                      {info.label}
+                    </span>
+                    <span className="flex items-baseline gap-[5px]">
+                      <span className={cx('font-serif text-[20px] leading-none', 'text-bg')}>{displayValue}</span>
+                      <span
+                        aria-hidden="true"
+                        className={cx('font-serif text-[20px] text-accent', active ? 'animate-[rf-caret-blink_1s_step-end_infinite]' : 'opacity-0')}
+                      >
+                        |
+                      </span>
+                      <span className={cx('font-sans text-[10.5px] font-semibold', active ? 'text-bg/50' : 'text-bg/30')}>
+                        {info.unit}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {isNumericPhase ? (
+              <>
+                {phase === 'carbs' && (
+                  <div className="mb-2 flex gap-1.5">
+                    {CARBS_PRESETS.map((preset) => (
+                      <button
+                        key={preset.value}
+                        type="button"
+                        className="flex-1 rounded-full border border-border bg-bg-soft px-1 py-2 font-sans text-[11.5px] font-semibold text-accent-deep transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-bg active:border-accent active:bg-accent active:text-bg"
+                        onClick={() => {
+                          patch({ carbsOverride: preset.value });
+                          setCarbsBuf('');
+                          advance();
+                        }}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-3 gap-2">
+                  {['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '→'].map((key) => {
+                    const isBackspace = key === '⌫';
+                    const isEnter = key === '→';
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        className={cx(
+                          'flex h-[58px] items-center justify-center rounded-[14px] border p-0 font-sans text-[24px] font-semibold transition-colors duration-150 lg:h-[62px]',
+                          isEnter
+                            ? 'border-accent bg-accent text-bg hover:bg-accent-deep active:bg-accent-deep'
+                            : isBackspace
+                              ? 'border-border bg-bg-soft text-accent-deep hover:border-accent active:border-accent active:bg-accent active:text-bg'
+                              : 'border-border bg-white text-text hover:border-accent-deep active:border-accent active:bg-accent active:text-bg'
+                        )}
+                        onClick={() => {
+                          if (isBackspace) tapBackspace();
+                          else if (isEnter) commitNumeric();
+                          else tapDigit(key);
+                        }}
+                      >
+                        {key}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mx-0.5 mb-0 mt-2.5 text-[12px] leading-[1.5] text-text-muted">
+                  {phase === 'duration'
+                    ? 'Minutes, door to finish. Picking a preset above fills a sensible number — adjust anything.'
+                    : phase === 'bodyweight'
+                      ? `In ${unitSystem === 'metric' ? 'kilograms' : 'pounds'}. Used to size sodium and savings estimates.`
+                      : 'Most runners handle 45–60 g/h. Above 90 g/h needs practice in training.'}
+                  {phase === 'carbs' && (
+                    <>
+                      {' '}
+                      <button
+                        type="button"
+                        aria-expanded={showCarbsHelp}
+                        onClick={() => setShowCarbsHelp((v) => !v)}
+                        className="cursor-pointer border-0 bg-transparent p-0 font-sans text-[12px] font-bold text-accent underline underline-offset-2"
+                      >
+                        How do I choose?
+                      </button>
+                    </>
+                  )}
+                </p>
+                {phase === 'carbs' && showCarbsHelp && (
+                  <ul className="m-0 mt-1 list-disc space-y-0.5 pl-4 text-[12px] text-text-muted">
+                    <li>Under ~2.5 h: 30–60 g/h is plenty.</li>
+                    <li>Marathon and longer: 60–90 g/h.</li>
+                    <li>90–120 g/h: only if you've practiced high intake repeatedly in training.</li>
+                  </ul>
+                )}
+                {phase === 'carbs' && carbsWarning && (
+                  <p
+                    className={cx(
+                      'mt-1 text-[12px] leading-relaxed',
+                      carbsWarning.tone === 'amber' ? 'rounded-md border border-amber bg-amber-soft px-2 py-1 text-amber' : 'text-text-muted'
+                    )}
+                  >
+                    {carbsWarning.text}
+                  </p>
+                )}
+              </>
+            ) : phase === 'flaskCount' ? (
+              <div className="grid grid-cols-4 gap-2">
+                {optionsFor(phase, unitSystem).map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    aria-pressed={String(state.flaskCount) === opt.key}
+                    className={cx(
+                      'flex h-[52px] items-center justify-center rounded-[12px] border font-sans text-[16px] font-semibold transition-colors duration-150 hover:border-accent',
+                      String(state.flaskCount) === opt.key ? 'border-accent bg-accent text-bg' : 'border-border bg-white text-text'
+                    )}
+                    onClick={() => selectOption(opt.key)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {optionsFor(phase, unitSystem).map((opt) => {
+                  const currentValue = fieldMeta(phase, state, unitSystem, carbsPerHour).value;
+                  const active = currentValue === opt.label || currentValue.toLowerCase() === opt.key.toLowerCase();
+                  return (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      className={cx(
+                        'flex min-h-[54px] items-center justify-between rounded-[14px] border px-[18px] py-2 text-left font-sans transition-colors duration-150 hover:border-accent',
+                        active ? 'border-accent bg-bg-soft' : 'border-border bg-white'
+                      )}
+                      onClick={() => selectOption(opt.key)}
+                    >
+                      <span className="text-[15.5px] font-semibold text-text">{opt.label}</span>
+                      {opt.desc && <span className="ml-3 max-w-[55%] text-[12px] leading-snug text-text-muted">{opt.desc}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+
+        {step === 3 && (
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-wrap gap-[5px]">
+              {[
+                MODE_CARDS.find((m) => m.key === state.mode)?.title ?? '',
+                `${state.durationMin} min`,
+                `${Math.round(displayWeight(state.weightKg, unitSystem))} ${weightUnit}`,
+                `${carbsPerHour} g/h · ${state.sweat} sweat`,
+              ].map((label) => (
+                <span key={label} className="rounded-full border border-border bg-bg-soft px-2.5 py-[5px] font-sans text-[11px] font-semibold text-green">
+                  {label}
+                </span>
+              ))}
+            </div>
+
+            {hyroxNote && (
+              <div className="rounded-lg border border-border bg-paper-warm p-4 font-sans text-[13px] leading-relaxed text-text">
+                <strong>HYROX honesty check:</strong> most races finish in 60–90 minutes, and under ~75 minutes you may not
+                need to buy anything mid-race — pre-race carbs and the race-morning routine do most of the work. {hyroxNote}
+              </div>
+            )}
+
+            {state.mode !== 'commercial' && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-lg border border-border bg-paper-warm p-5">
+                  <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-text">
+                    Your recipe — per {state.mode === 'bottle' ? 'bottle' : 'flask'}
+                  </h3>
+                  <p className="mb-3 mt-1 font-sans text-[12px] text-text-muted">{servingLabel}</p>
+                  <ul className="m-0 list-none space-y-2 p-0 font-sans text-[14px]">
+                    <li>
+                      <strong>{round(recipe.maltoG)} g</strong> maltodextrin{' '}
+                      <span className="text-text-muted">(≈ {round(recipe.maltoG / TSP_GRAMS.malto)} tsp)</span>
+                    </li>
+                    <li>
+                      <strong>{round(recipe.fructoseG)} g</strong> fructose{' '}
+                      <span className="text-text-muted">(≈ {round(recipe.fructoseG / TSP_GRAMS.fructose)} tsp)</span>
+                    </li>
+                    <li>
+                      <strong>{round(recipe.sodiumIngredientG, 2)} g</strong> {SODIUM_FORMS[state.sodiumForm].label.toLowerCase()}{' '}
+                      <span className="text-text-muted">
+                        (≈ {round(recipe.sodiumIngredientG / sodiumG, 2)} tsp · {Math.round(recipe.sodiumMgPerServing)} mg sodium)
+                      </span>
+                    </li>
+                    <li>
+                      <strong>{volumeLabel(recipe.waterMlPerServing, unitSystem)}</strong> water
+                    </li>
+                  </ul>
+                  <p className="mb-0 mt-3 font-sans text-[12px] text-text-muted">
+                    Grams first — teaspoons are rough. A basic kitchen scale (under {cur}10) makes this repeatable.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <div className={`rounded-lg border-2 p-4 ${gut.chip}`}>
+                    <p className="m-0 font-sans text-[13px] font-extrabold uppercase tracking-[0.08em]">
+                      Estimated gut-load: {gut.label}
+                    </p>
+                    <p className="mb-0 mt-1 font-sans text-[13px] leading-relaxed text-text">
+                      {round(recipe.concentration)} g carbs per 100 ml. {gut.advice} This is an estimate from concentration,
+                      ingredient type and sodium — not a lab osmolality test.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-white p-4 font-sans text-[14px]">
+                    <ul className="m-0 list-none space-y-1.5 p-0">
+                      <li>
+                        Carbs delivered: <strong>{carbsPerHour} g/hour</strong> ·{' '}
+                        <strong>{Math.round(recipe.totalCarbs)} g total</strong> over {round(state.durationMin / 60)} h
+                      </li>
+                      <li>
+                        Servings for the session: <strong>{round(recipe.servingCount)}</strong>
+                      </li>
+                      <li>
+                        Cost per serving: <strong>{money(recipe.costPerServing)}</strong>
+                      </li>
+                      <li>
+                        Cost per gram of carb:{' '}
+                        <strong>
+                          {cur}
+                          {recipe.costPerGramCarb.toFixed(4)}
+                        </strong>{' '}
+                        <span className="text-text-muted">(≈ {money(recipe.costPerGramCarb * 60)} per 60 g)</span>
+                      </li>
+                      <li>
+                        Whole session DIY: <strong>{money(recipe.sessionCost)}</strong> vs gels ≈{' '}
+                        <strong>{money(recipe.gelSessionCost)}</strong>{' '}
+                        <span className="text-text-muted">
+                          ({recipe.gelsForSession} × {money(state.prices.gelPrice)})
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {state.mode === 'commercial' && (
+              <div>
+                <div className="rounded-lg border border-border bg-white p-4 font-sans text-[14px]">
+                  Your DIY reference mix (same targets, bottle mix):{' '}
+                  <strong>
+                    {cur}
+                    {recipe.costPerGramCarb.toFixed(4)}
+                  </strong>{' '}
+                  per gram of carb <span className="text-text-muted">(≈ {money(recipe.costPerGramCarb * 60)} per 60 g)</span>.
+                  Every product below shows the same metric so you can compare buy vs make directly.
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {useCasePicks(state.region).map((pick) => (
+                    <div key={pick.label} className="rounded-lg border border-border bg-paper-warm px-3 py-2">
+                      <span className="block font-sans text-[10.5px] font-extrabold uppercase tracking-[0.08em] text-accent">
+                        {pick.label}
+                      </span>
+                      <span className="block font-sans text-[13px] font-bold text-text">
+                        {pick.product.brand} {pick.product.product}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full border-collapse font-sans text-[13px]">
+                    <thead>
+                      <tr className="border-b-2 border-border text-left">
+                        <th className="py-2 pr-3 font-extrabold">Product</th>
+                        <th className="py-2 pr-3 font-extrabold">Carbs</th>
+                        <th className="py-2 pr-3 font-extrabold">Sodium</th>
+                        <th className="py-2 pr-3 font-extrabold">Caffeine</th>
+                        <th className="py-2 pr-3 font-extrabold">Typical price</th>
+                        <th className="py-2 pr-3 font-extrabold">Per g carb</th>
+                        <th className="py-2 pr-3 font-extrabold">Per 60 g</th>
+                        <th className="py-2 font-extrabold"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productsForRegion(state.region).map((p) => (
+                        <tr key={p.id} className="border-b border-border align-top">
+                          <td className="py-2 pr-3">
+                            <strong>
+                              {p.brand} {p.product}
+                            </strong>
+                            <span className="block text-[11.5px] text-text-muted">
+                              {p.servingSize}
+                              {p.note ? ` · ${p.note}` : ''}
+                            </span>
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap">{p.carbsG} g</td>
+                          <td className="py-2 pr-3 whitespace-nowrap">{p.sodiumMg} mg</td>
+                          <td className="py-2 pr-3 whitespace-nowrap">{p.caffeineMg > 0 ? `${p.caffeineMg} mg` : '—'}</td>
+                          <td className="py-2 pr-3 whitespace-nowrap">
+                            {p.currency}
+                            {p.typicalPrice.toFixed(2)}
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap">
+                            {p.currency}
+                            {costPerGramCarb(p).toFixed(4)}
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap">
+                            {p.currency}
+                            {(costPerGramCarb(p) * 60).toFixed(2)}
+                          </td>
+                          <td className="py-2 whitespace-nowrap">
+                            <button
+                              type="button"
+                              className="rounded-md border border-border bg-white px-2 py-1 text-[11.5px] font-bold text-text-muted hover:border-accent-deep hover:text-text"
+                              onClick={() => patchPrices({ gelPrice: p.typicalPrice, gelCarbs: p.carbsG, currency: p.currency })}
+                              title="Use this product's price and carbs in the training-block savings comparison below"
+                            >
+                              Use in savings
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className="mb-0 mt-3 font-sans text-[12px] leading-relaxed text-text-muted">
+                  Typical single-unit prices, last checked 2026-07 — multipacks are usually cheaper, and sodium/caffeine vary
+                  by flavour. Ranked by cost per gram of carbohydrate within your region; picks above are by use case, never
+                  "best overall". For live prices in your country, the{' '}
+                  <a href="/ai-race-fuel-prompt-generator/" className="font-bold text-accent">
+                    prompt generator
+                  </a>{' '}
+                  asks your AI to check today's shelves.
+                </p>
+              </div>
+            )}
+
+            <div className="fuel-card-green rounded-lg border border-border p-5">
+              <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-green">
+                Training-block savings estimate
+              </h3>
+              <div className="mt-3 grid grid-cols-3 gap-3 md:max-w-md">
+                <div>
+                  <label className={labelCls} htmlFor="rf-spw">
+                    Sessions/week
+                  </label>
+                  <input
+                    id="rf-spw"
+                    type="number"
+                    min="1"
+                    max="14"
+                    className={inputCls}
+                    value={state.sessionsPerWeek}
+                    onChange={(e) => {
+                      const raw = Number(e.target.value);
+                      patch({ sessionsPerWeek: Number.isFinite(raw) ? raw : 0 });
+                    }}
+                    onBlur={(e) => patch({ sessionsPerWeek: clamp(Math.round(Number(e.target.value) || 1), 1, 14) })}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls} htmlFor="rf-avg">
+                    Avg mins
+                  </label>
+                  <input
+                    id="rf-avg"
+                    type="number"
+                    min="20"
+                    max="600"
+                    className={inputCls}
+                    value={state.avgSessionMin}
+                    onChange={(e) => {
+                      const raw = Number(e.target.value);
+                      patch({ avgSessionMin: Number.isFinite(raw) ? raw : 0 });
+                    }}
+                    onBlur={(e) => patch({ avgSessionMin: clamp(Number(e.target.value) || 20, 20, 600) })}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls} htmlFor="rf-weeks">
+                    Weeks
+                  </label>
+                  <input
+                    id="rf-weeks"
+                    type="number"
+                    min="1"
+                    max="52"
+                    className={inputCls}
+                    value={state.weeks}
+                    onChange={(e) => {
+                      const raw = Number(e.target.value);
+                      patch({ weeks: Number.isFinite(raw) ? raw : 0 });
+                    }}
+                    onBlur={(e) => patch({ weeks: clamp(Math.round(Number(e.target.value) || 1), 1, 52) })}
+                  />
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 font-sans text-[14px] md:grid-cols-3">
+                <div className="rounded-lg bg-white p-3">
+                  Commercial gels: <strong>{money(savings.gelCost)}</strong>
+                  <span className="block text-[12px] text-text-muted">{savings.gels} gels over the block</span>
+                </div>
+                <div className="rounded-lg bg-white p-3">
+                  DIY mix: <strong>{money(savings.diyCost)}</strong>
+                  <span className="block text-[12px] text-text-muted">
+                    {Math.round(savings.totalCarbs)} g carbs · {round(savings.totalHours)} fuelled hours
+                  </span>
+                </div>
+                <div className="rounded-lg bg-green p-3 text-white">
+                  Estimated saving: <strong>{money(Math.max(0, savings.saving))}</strong>
+                  <span className="block text-[12px] opacity-90">at {carbsPerHour} g/h target</span>
+                </div>
+              </div>
+            </div>
+
+            <details className="rounded-lg border border-border bg-white p-4">
+              <summary className="cursor-pointer font-sans text-[13px] font-extrabold uppercase tracking-[0.1em] text-text">
+                Edit ingredient prices ({cur}/kg) &amp; gel reference
+              </summary>
+              <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div>
+                  <label className={labelCls} htmlFor="rf-cur">
+                    Currency symbol
+                  </label>
+                  <input
+                    id="rf-cur"
+                    type="text"
+                    maxLength={4}
+                    className={inputCls}
+                    value={state.prices.currency}
+                    onChange={(e) => patchPrices({ currency: e.target.value || '€' })}
+                  />
+                </div>
+                {(
+                  [
+                    ['maltoPerKg', 'Maltodextrin /kg'],
+                    ['fructosePerKg', 'Fructose /kg'],
+                    ['saltPerKg', 'Table salt /kg'],
+                    ['citratePerKg', 'Sodium citrate /kg'],
+                    ['gelPrice', 'Gel price (each)'],
+                    ['gelCarbs', 'Carbs per gel (g)'],
+                  ] as Array<[keyof Prices, string]>
+                ).map(([key, text]) => (
+                  <div key={key}>
+                    <label className={labelCls} htmlFor={`rf-${key}`}>
+                      {text}
+                    </label>
+                    <input
+                      id={`rf-${key}`}
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      className={inputCls}
+                      value={state.prices[key] as number}
+                      onChange={(e) => patchPrices({ [key]: Math.max(0, Number(e.target.value) || 0) } as Partial<Prices>)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="mb-0 mt-3 font-sans text-[12px] text-text-muted">
+                Set your local prices and currency — the defaults are only rough EU starting points.
+              </p>
+            </details>
+
+            <div className="flex flex-col gap-2 pb-1.5">
+              <button type="button" onClick={share} className="fuel-btn fuel-btn-accent w-full border-0 text-[15px]">
+                {copied ? 'Link copied — share it with a training partner' : 'Copy shareable link'}
+              </button>
+              <p className="m-0 text-center font-sans text-[12px] text-text-muted">
+                Your inputs are encoded in the URL — send it to a training partner.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-amber bg-amber-soft p-4 font-sans text-[13px] leading-relaxed">
+              <strong>Caffeine is deliberately not in this calculator.</strong> If you use it: guidance is 3–6 mg per kg of
+              bodyweight (≈ {Math.round(state.weightKg * 3)}–{Math.round(state.weightKg * 6)} mg for{' '}
+              {Math.round(displayWeight(state.weightKg, unitSystem))} {weightUnit}), taken 30–60 minutes before, tested in
+              training first. Use gels or tablets with a measured dose — never pure caffeine powder.
+            </div>
+            <p className="m-0 font-sans text-[12px] leading-relaxed text-text-muted">
+              Every output here is a training-tested starting point, not a prescription: start at the lower end, test on
+              easy long sessions, and never try anything new on race day.
+            </p>
           </div>
         )}
       </div>
-
-      {hyroxNote && (
-        <div className="mt-4 rounded-lg border border-border bg-paper-warm p-4 font-sans text-[13px] leading-relaxed text-text">
-          <strong>HYROX honesty check:</strong> most races finish in 60–90 minutes, and under ~75 minutes you may not
-          need to buy anything mid-race — pre-race carbs and the race-morning routine do most of the work. {hyroxNote}
-        </div>
-      )}
-
-      {/* Per-serving recipe (DIY modes) */}
-      {state.mode !== 'commercial' && (
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border border-border bg-paper-warm p-5">
-          <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-text">
-            Your recipe — per {state.mode === 'bottle' ? 'bottle' : 'flask'}
-          </h3>
-          <p className="mb-3 mt-1 font-sans text-[12px] text-text-muted">{servingLabel}</p>
-          <ul className="m-0 list-none space-y-2 p-0 font-sans text-[14px]">
-            <li>
-              <strong>{round(recipe.maltoG)} g</strong> maltodextrin{' '}
-              <span className="text-text-muted">(≈ {round(recipe.maltoG / TSP_GRAMS.malto)} tsp)</span>
-            </li>
-            <li>
-              <strong>{round(recipe.fructoseG)} g</strong> fructose{' '}
-              <span className="text-text-muted">(≈ {round(recipe.fructoseG / TSP_GRAMS.fructose)} tsp)</span>
-            </li>
-            <li>
-              <strong>{round(recipe.sodiumIngredientG, 2)} g</strong> {SODIUM_FORMS[state.sodiumForm].label.toLowerCase()}{' '}
-              <span className="text-text-muted">
-                (≈ {round(recipe.sodiumIngredientG / sodiumG, 2)} tsp · {Math.round(recipe.sodiumMgPerServing)} mg sodium)
-              </span>
-            </li>
-            <li>
-              <strong>{volumeLabel(recipe.waterMlPerServing, unitSystem)}</strong> water
-            </li>
-          </ul>
-          <p className="mb-0 mt-3 font-sans text-[12px] text-text-muted">
-            Grams first — teaspoons are rough. A basic kitchen scale (under {cur}10) makes this repeatable.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className={`rounded-lg border-2 p-4 ${gut.chip}`}>
-            <p className="m-0 font-sans text-[13px] font-extrabold uppercase tracking-[0.08em]">
-              Estimated gut-load: {gut.label}
-            </p>
-            <p className="mb-0 mt-1 font-sans text-[13px] leading-relaxed text-text">
-              {round(recipe.concentration)} g carbs per 100 ml. {gut.advice} This is an estimate from concentration,
-              ingredient type and sodium — not a lab osmolality test.
-            </p>
-          </div>
-          <div className="rounded-lg border border-border bg-white p-4 font-sans text-[14px]">
-            <ul className="m-0 list-none space-y-1.5 p-0">
-              <li>
-                Carbs delivered: <strong>{carbsPerHour} g/hour</strong> ·{' '}
-                <strong>{Math.round(recipe.totalCarbs)} g total</strong> over {round(state.durationMin / 60)} h
-              </li>
-              <li>
-                Servings for the session: <strong>{round(recipe.servingCount)}</strong>
-              </li>
-              <li>
-                Cost per serving: <strong>{money(recipe.costPerServing)}</strong>
-              </li>
-              <li>
-                Cost per gram of carb: <strong>
-                  {cur}
-                  {recipe.costPerGramCarb.toFixed(4)}
-                </strong>{' '}
-                <span className="text-text-muted">(≈ {money(recipe.costPerGramCarb * 60)} per 60 g)</span>
-              </li>
-              <li>
-                Whole session DIY: <strong>{money(recipe.sessionCost)}</strong> vs gels ≈{' '}
-                <strong>{money(recipe.gelSessionCost)}</strong>{' '}
-                <span className="text-text-muted">({recipe.gelsForSession} × {money(state.prices.gelPrice)})</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      )}
-
-      {/* Commercial gel comparison (phase 2 dataset) */}
-      {state.mode === 'commercial' && (
-        <div className="mt-6">
-          <div className="rounded-lg border border-border bg-white p-4 font-sans text-[14px]">
-            Your DIY reference mix (same targets, bottle mix): <strong>{cur}{recipe.costPerGramCarb.toFixed(4)}</strong>{' '}
-            per gram of carb <span className="text-text-muted">(≈ {money(recipe.costPerGramCarb * 60)} per 60 g)</span>.
-            Every product below shows the same metric so you can compare buy vs make directly.
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {useCasePicks(state.region).map((pick) => (
-              <div key={pick.label} className="rounded-lg border border-border bg-paper-warm px-3 py-2">
-                <span className="block font-sans text-[10.5px] font-extrabold uppercase tracking-[0.08em] text-accent">
-                  {pick.label}
-                </span>
-                <span className="block font-sans text-[13px] font-bold text-text">
-                  {pick.product.brand} {pick.product.product}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full border-collapse font-sans text-[13px]">
-              <thead>
-                <tr className="border-b-2 border-border text-left">
-                  <th className="py-2 pr-3 font-extrabold">Product</th>
-                  <th className="py-2 pr-3 font-extrabold">Carbs</th>
-                  <th className="py-2 pr-3 font-extrabold">Sodium</th>
-                  <th className="py-2 pr-3 font-extrabold">Caffeine</th>
-                  <th className="py-2 pr-3 font-extrabold">Typical price</th>
-                  <th className="py-2 pr-3 font-extrabold">Per g carb</th>
-                  <th className="py-2 pr-3 font-extrabold">Per 60 g</th>
-                  <th className="py-2 font-extrabold"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {productsForRegion(state.region).map((p) => (
-                  <tr key={p.id} className="border-b border-border align-top">
-                    <td className="py-2 pr-3">
-                      <strong>
-                        {p.brand} {p.product}
-                      </strong>
-                      <span className="block text-[11.5px] text-text-muted">
-                        {p.servingSize}
-                        {p.note ? ` · ${p.note}` : ''}
-                      </span>
-                    </td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{p.carbsG} g</td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{p.sodiumMg} mg</td>
-                    <td className="py-2 pr-3 whitespace-nowrap">{p.caffeineMg > 0 ? `${p.caffeineMg} mg` : '—'}</td>
-                    <td className="py-2 pr-3 whitespace-nowrap">
-                      {p.currency}
-                      {p.typicalPrice.toFixed(2)}
-                    </td>
-                    <td className="py-2 pr-3 whitespace-nowrap">
-                      {p.currency}
-                      {costPerGramCarb(p).toFixed(4)}
-                    </td>
-                    <td className="py-2 pr-3 whitespace-nowrap">
-                      {p.currency}
-                      {(costPerGramCarb(p) * 60).toFixed(2)}
-                    </td>
-                    <td className="py-2 whitespace-nowrap">
-                      <button
-                        type="button"
-                        className="rounded-md border border-border bg-white px-2 py-1 text-[11.5px] font-bold text-text-muted hover:border-accent-deep hover:text-text"
-                        onClick={() =>
-                          patchPrices({ gelPrice: p.typicalPrice, gelCarbs: p.carbsG, currency: p.currency })
-                        }
-                        title="Use this product's price and carbs in the training-block savings comparison below"
-                      >
-                        Use in savings
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <p className="mb-0 mt-3 font-sans text-[12px] leading-relaxed text-text-muted">
-            Typical single-unit prices, last checked 2026-07 — multipacks are usually cheaper, and sodium/caffeine vary
-            by flavour. Ranked by cost per gram of carbohydrate within your region; picks above are by use case, never
-            "best overall". For live prices in your country, the{' '}
-            <a href="/ai-race-fuel-prompt-generator/" className="font-bold text-accent">
-              prompt generator
-            </a>{' '}
-            asks your AI to check today's shelves.
-          </p>
-        </div>
-      )}
-
-      {/* Training-block savings */}
-      <div className="fuel-card-green mt-6 rounded-lg border border-border p-5">
-        <h3 className="m-0 font-sans text-sm font-extrabold uppercase tracking-[0.1em] text-green">
-          Training-block savings estimate
-        </h3>
-        <div className="mt-3 grid grid-cols-3 gap-3 md:max-w-md">
-          <div>
-            <label className={labelCls} htmlFor="rf-spw">
-              Sessions/week
-            </label>
-            <input
-              id="rf-spw"
-              type="number"
-              min="1"
-              max="14"
-              className={inputCls}
-              value={state.sessionsPerWeek}
-              onKeyDown={blockNonDigitKeys}
-              onChange={(e) => {
-                const raw = Number(e.target.value);
-                patch({ sessionsPerWeek: Number.isFinite(raw) ? raw : 0 });
-              }}
-              onBlur={(e) => patch({ sessionsPerWeek: clamp(Math.round(Number(e.target.value) || 1), 1, 14) })}
-            />
-          </div>
-          <div>
-            <label className={labelCls} htmlFor="rf-avg">
-              Avg mins
-            </label>
-            <input
-              id="rf-avg"
-              type="number"
-              min="20"
-              max="600"
-              className={inputCls}
-              value={state.avgSessionMin}
-              onKeyDown={blockNonDigitKeys}
-              onChange={(e) => {
-                const raw = Number(e.target.value);
-                patch({ avgSessionMin: Number.isFinite(raw) ? raw : 0 });
-              }}
-              onBlur={(e) => patch({ avgSessionMin: clamp(Number(e.target.value) || 20, 20, 600) })}
-            />
-          </div>
-          <div>
-            <label className={labelCls} htmlFor="rf-weeks">
-              Weeks
-            </label>
-            <input
-              id="rf-weeks"
-              type="number"
-              min="1"
-              max="52"
-              className={inputCls}
-              value={state.weeks}
-              onKeyDown={blockNonDigitKeys}
-              onChange={(e) => {
-                const raw = Number(e.target.value);
-                patch({ weeks: Number.isFinite(raw) ? raw : 0 });
-              }}
-              onBlur={(e) => patch({ weeks: clamp(Math.round(Number(e.target.value) || 1), 1, 52) })}
-            />
-          </div>
-        </div>
-        <div className="mt-4 grid gap-2 font-sans text-[14px] md:grid-cols-3">
-          <div className="rounded-lg bg-white p-3">
-            Commercial gels: <strong>{money(savings.gelCost)}</strong>
-            <span className="block text-[12px] text-text-muted">{savings.gels} gels over the block</span>
-          </div>
-          <div className="rounded-lg bg-white p-3">
-            DIY mix: <strong>{money(savings.diyCost)}</strong>
-            <span className="block text-[12px] text-text-muted">
-              {Math.round(savings.totalCarbs)} g carbs · {round(savings.totalHours)} fuelled hours
-            </span>
-          </div>
-          <div className="rounded-lg bg-green p-3 text-white">
-            Estimated saving: <strong>{money(Math.max(0, savings.saving))}</strong>
-            <span className="block text-[12px] opacity-90">at {carbsPerHour} g/h target</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Editable prices */}
-      <details className="mt-6 rounded-lg border border-border bg-white p-4">
-        <summary className="cursor-pointer font-sans text-[13px] font-extrabold uppercase tracking-[0.1em] text-text">
-          Edit ingredient prices ({cur}/kg) &amp; gel reference
-        </summary>
-        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div>
-            <label className={labelCls} htmlFor="rf-cur">
-              Currency symbol
-            </label>
-            <input
-              id="rf-cur"
-              type="text"
-              maxLength={4}
-              className={inputCls}
-              value={state.prices.currency}
-              onChange={(e) => patchPrices({ currency: e.target.value || '€' })}
-            />
-          </div>
-          {(
-            [
-              ['maltoPerKg', 'Maltodextrin /kg'],
-              ['fructosePerKg', 'Fructose /kg'],
-              ['saltPerKg', 'Table salt /kg'],
-              ['citratePerKg', 'Sodium citrate /kg'],
-              ['gelPrice', 'Gel price (each)'],
-              ['gelCarbs', 'Carbs per gel (g)'],
-            ] as Array<[keyof Prices, string]>
-          ).map(([key, text]) => (
-            <div key={key}>
-              <label className={labelCls} htmlFor={`rf-${key}`}>
-                {text}
-              </label>
-              <input
-                id={`rf-${key}`}
-                type="number"
-                min="0"
-                step="0.1"
-                className={inputCls}
-                value={state.prices[key] as number}
-                onChange={(e) => patchPrices({ [key]: Math.max(0, Number(e.target.value) || 0) } as Partial<Prices>)}
-              />
-            </div>
-          ))}
-        </div>
-        <p className="mb-0 mt-3 font-sans text-[12px] text-text-muted">
-          Set your local prices and currency — the defaults are only rough EU starting points.
-        </p>
-      </details>
-
-      {/* Share + caffeine + framing */}
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button type="button" onClick={share} className="fuel-btn fuel-btn-accent border-0 text-[14px]">
-          {copied ? 'Link copied ✓' : 'Copy shareable link'}
-        </button>
-        <p className="m-0 font-sans text-[12px] text-text-muted">
-          Your inputs are encoded in the URL — send it to a training partner.
-        </p>
-      </div>
-      <div className="mt-5 rounded-lg border border-amber bg-amber-soft p-4 font-sans text-[13px] leading-relaxed">
-        <strong>Caffeine is deliberately not in this calculator.</strong> If you use it: guidance is 3–6 mg per kg of
-        bodyweight (≈ {Math.round(state.weightKg * 3)}–{Math.round(state.weightKg * 6)} mg for{' '}
-        {Math.round(displayWeight(state.weightKg, unitSystem))} {weightUnit}),
-        taken 30–60 minutes before, tested in training first. Use gels or tablets with a measured dose — never pure
-        caffeine powder.
-      </div>
-      <p className="mb-0 mt-4 font-sans text-[12px] leading-relaxed text-text-muted">
-        Every output here is a training-tested starting point, not a prescription: start at the lower end, test on easy
-        long sessions, and never try anything new on race day.
-      </p>
     </div>
   );
 }
