@@ -41,20 +41,10 @@ const steps = [
   canonical="/recovery-drink-builder/"
   jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/recovery-drink-builder/' })]}
 >
-  <main style="max-width:1280px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(1rem,4vw,3rem) 20px;">
-    <div style="max-width:680px;display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
-      <p class="fuel-eyebrow">Recovery · DIY builder</p>
-      <h1 style="font-size:clamp(34px,4.5vw,52px);line-height:1.05;margin:0;">Build your recovery drink</h1>
-      <p style="font-size:18px;line-height:1.7;color:var(--color-text-muted);margin:0;">
-        Answer a few questions about your session and get a personalised DIY recovery-drink recipe with cost, shown
-        alongside the commercial mixes it's competing with. Whatever you mix is a training-tested starting point —
-        test it in training, never try anything new on race day.
-      </p>
-    </div>
+  <RecoveryDrinkBuilder client:load />
 
-    <RecoveryDrinkBuilder client:load />
-
-    <section style="margin-top:56px;">
+  <main style="max-width:1280px;margin:0 auto;padding:0 clamp(1rem,4vw,3rem) clamp(32px,5vw,56px);">
+    <section style="margin-top:40px;">
       <p class="fuel-eyebrow">Store-bought comparison</p>
       <h2 style="font-family:var(--font-serif);font-size:clamp(24px,3vw,32px);margin:8px 0 0;">
         How it compares to commercial recovery mixes
