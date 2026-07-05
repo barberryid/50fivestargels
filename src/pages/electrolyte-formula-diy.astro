@@ -3,11 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SimpleTable from '../components/SimpleTable.astro';
 import { absoluteUrl, canonicalUrl, siteName, webPageJsonLd } from '../lib/seo';
 
-const title = 'DIY Electrolyte Drink Mix for Runners & HYROX | 50FiveStarGels';
-const pageTitle = 'DIY Electrolyte Drink Mix for Runners, HYROX and Heavy Sweaters';
+const title = 'Electrolyte Formula DIY — Drink Mix for Runners & HYROX | 50FiveStarGels';
+const pageTitle = 'Electrolyte Formula DIY — for Runners, HYROX and Heavy Sweaters';
 const description =
   'Make your own electrolyte drink for running, HYROX and heavy sweating. Includes everyday and heavy-sweater recipes with sodium, potassium, carbs and safety notes.';
-const path = '/diy-electrolyte-drink/';
+const path = '/electrolyte-formula-diy/';
 
 const everydayRecipe = [
   ['Water', '1 litre'],
@@ -118,7 +118,7 @@ const breadcrumbSchema = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl('/') },
-    { '@type': 'ListItem', position: 2, name: 'DIY electrolyte drink', item: canonicalUrl(path) },
+    { '@type': 'ListItem', position: 2, name: 'Electrolyte Formula DIY', item: canonicalUrl(path) },
   ],
 };
 ---
@@ -354,7 +354,7 @@ const breadcrumbSchema = {
       <p>
         For more race-specific context, see the <a href="/hyrox-gel-guide/">HYROX fuelling guide</a>, the
         <a href="/marathon-gel-guide/">marathon fuelling guide</a>, the
-        <a href="/running-gel-cost-calculator/">race fuel cost calculator</a>, and the
+        <a href="/gel-maker-diy/">Gel Maker DIY</a>, and the
         <a href="/ai-race-fuel-prompt-generator/">AI race fuel prompt generator</a>.
       </p>
     </section>

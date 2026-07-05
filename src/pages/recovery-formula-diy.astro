@@ -4,15 +4,15 @@ import RecoveryDrinkBuilder from '../components/recoverybuilder/RecoveryDrinkBui
 import { webPageJsonLd, canonicalUrl } from '../lib/seo';
 import { AVAILABILITY_NOTES, RECOVERY_PRODUCTS, RECOVERY_VERDICTS } from '../data/recoveryData';
 
-const title = 'Recovery Drink Builder — DIY recipe + store-bought comparison | 50FiveStarGels';
+const title = 'Recovery Formula DIY — DIY recipe + store-bought comparison | 50FiveStarGels';
 const description =
   'Build a personalised DIY recovery drink from your bodyweight and session type — carbs, protein, sodium and cost, live — then compare it against seven verified commercial recovery mixes.';
 
 const webAppJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Recovery Drink Builder',
-  url: canonicalUrl('/recovery-drink-builder/'),
+  name: 'Recovery Formula DIY',
+  url: canonicalUrl('/recovery-formula-diy/'),
   applicationCategory: 'HealthApplication',
   operatingSystem: 'Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
@@ -38,8 +38,8 @@ const steps = [
 <BaseLayout
   title={title}
   description={description}
-  canonical="/recovery-drink-builder/"
-  jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/recovery-drink-builder/' })]}
+  canonical="/recovery-formula-diy/"
+  jsonLd={[webAppJsonLd, webPageJsonLd({ title, description, path: '/recovery-formula-diy/' })]}
 >
   <RecoveryDrinkBuilder client:load />
 
@@ -145,8 +145,8 @@ const steps = [
       </p>
       <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;margin:14px 0 0;">
         Want a fuelling plan for during the session instead? See the
-        <a href="/running-gel-cost-calculator/" style="color:var(--color-accent);font-weight:700;">
-          Race Fuel Cost Calculator
+        <a href="/gel-maker-diy/" style="color:var(--color-accent);font-weight:700;">
+          Gel Maker DIY
         </a>
         or the
         <a href="/ai-race-fuel-prompt-generator/" style="color:var(--color-accent);font-weight:700;">

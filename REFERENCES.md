@@ -47,7 +47,10 @@ Pages project is connected. (confirmed 2026-07-02)
 ## Key file paths
 
 - Homepage: `src/pages/index.astro`
-- Calculator page (canonical slug `/running-gel-cost-calculator/`): `src/pages/running-gel-cost-calculator.astro`
+- Gel Maker DIY page (canonical slug `/gel-maker-diy/`, formerly `/running-gel-cost-calculator/`): `src/pages/gel-maker-diy.astro`
+- Recovery Formula DIY page (canonical slug `/recovery-formula-diy/`, formerly `/recovery-drink-builder/`): `src/pages/recovery-formula-diy.astro`
+- Electrolyte Formula DIY page (canonical slug `/electrolyte-formula-diy/`, formerly `/diy-electrolyte-drink/`): `src/pages/electrolyte-formula-diy.astro`
+- Old-slug 301 redirects: `public/_redirects`
 - Calculator React island: `src/components/calculator/RaceFuelCalculator.tsx`
 - Calculator maths (pure functions): `src/lib/fuelMath.ts`
 - Prompt generator page (canonical slug /ai-race-fuel-prompt-generator/): `src/pages/ai-race-fuel-prompt-generator.astro`

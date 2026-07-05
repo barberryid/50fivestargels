@@ -21,11 +21,13 @@ const cards = [
 ];
 
 const fuelingLinks = [
+  { label: 'Gel Maker DIY', href: '/gel-maker-diy/' },
+  { label: 'Recovery Formula DIY', href: '/recovery-formula-diy/' },
+  { label: 'Electrolyte Formula DIY', href: '/electrolyte-formula-diy/' },
   { label: 'AI fuelling prompt generator', href: '/ai-race-fuel-prompt-generator/' },
   { label: 'Marathon fuelling guide', href: '/marathon-gel-guide/' },
   { label: 'HYROX fuelling guide', href: '/hyrox-gel-guide/' },
-  { label: 'DIY electrolyte drink guide', href: '/diy-electrolyte-drink/' },
-  { label: 'Commercial gel comparison', href: '/running-gel-cost-calculator/?mode=commercial' },
+  { label: 'Commercial gel comparison', href: '/gel-maker-diy/?mode=commercial' },
 ];
 ---
 
@@ -45,7 +47,6 @@ const fuelingLinks = [
           <span style="font-family:var(--font-serif);font-size:17px;line-height:0.95;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);">50Five<br />Star<br />Gels</span>
         </div>
         <nav class="home-hero-nav" style="display:flex;align-items:center;flex-wrap:wrap;gap:20px 28px;padding-top:10px;">
-          <a href="/running-gel-cost-calculator/" class="gel-nav-link" style="font-family:var(--font-serif);font-size:16px;letter-spacing:-0.01em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Calculator</a>
           {
             fuelingLinks.map((link) => (
               <a
@@ -89,10 +90,10 @@ const fuelingLinks = [
         <div>
           <p style="font-family:var(--font-body);font-size:17px;font-weight:500;line-height:1.65;color:var(--color-bg);margin:0 0 28px;">Compare gels by cost per gram of carbohydrate and calculate your own DIY race mix for marathon, half marathon, HYROX and long training — with editable prices that work in any currency.</p>
           <a
-            href="/running-gel-cost-calculator/"
+            href="/gel-maker-diy/"
             class="gel-cta-btn"
             style="display:inline-block;font-family:var(--font-body);font-size:15px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;background:var(--color-accent);color:var(--color-bg);padding:18px 32px;border-radius:9999px;text-decoration:none;transition:transform 160ms ease,background 160ms ease;"
-            >Open the calculator →</a
+            >Open the Gel Maker →</a
           >
         </div>
       </div>

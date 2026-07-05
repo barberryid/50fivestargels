@@ -73,8 +73,8 @@ export function webApplicationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Race Fuel Cost Calculator',
-    url: canonicalUrl('/running-gel-cost-calculator/'),
+    name: 'Gel Maker DIY',
+    url: canonicalUrl('/gel-maker-diy/'),
     applicationCategory: 'HealthApplication',
     operatingSystem: 'Web',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },

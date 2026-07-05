@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import RaceFuelCalculator from '../components/calculator/RaceFuelCalculator';
 import { webApplicationJsonLd, webPageJsonLd } from '../lib/seo';
 
-const title = 'Race Fuel Cost Calculator — DIY race mix vs gels, priced per gram of carb';
+const title = 'Gel Maker DIY — DIY race mix vs gels, priced per gram of carb';
 const description =
   'Work out a DIY bottle mix or soft-flask syrup for marathon, half marathon, HYROX or long training — with cost per gram of carbohydrate, a training-block savings estimate and an honest gut-load warning.';
 
@@ -26,10 +26,10 @@ const trustBlocks = [
 <BaseLayout
   title={title}
   description={description}
-  canonical="/running-gel-cost-calculator/"
+  canonical="/gel-maker-diy/"
   jsonLd={[
     webApplicationJsonLd(),
-    webPageJsonLd({ title, description, path: '/running-gel-cost-calculator/' }),
+    webPageJsonLd({ title, description, path: '/gel-maker-diy/' }),
   ]}
 >
   <RaceFuelCalculator client:load />
@@ -78,7 +78,7 @@ const trustBlocks = [
     <section style="margin-top:28px;max-width:72ch;">
       <p style="color:var(--color-text-muted);line-height:1.7;font-size:0.9rem;margin:0;">
         Sorted your during-session fuel? The
-        <a href="/recovery-drink-builder/" style="color:var(--color-accent);font-weight:700;">Recovery Drink Builder</a>
+        <a href="/recovery-formula-diy/" style="color:var(--color-accent);font-weight:700;">Recovery Formula DIY</a>
         works out a DIY recovery mix and compares it against commercial recovery drinks.
       </p>
     </section>
