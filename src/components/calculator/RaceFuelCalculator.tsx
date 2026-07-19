@@ -536,7 +536,7 @@ export default function RaceFuelCalculator() {
               type="button"
               aria-label="Back"
               onClick={back}
-              className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
+              className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 before:absolute before:-inset-[7px] before:content-[''] hover:border-accent active:border-accent active:bg-bg-soft"
             >
               ←
             </button>
@@ -605,7 +605,7 @@ export default function RaceFuelCalculator() {
               </button>
             </div>
 
-            <div className="mb-3 flex flex-col gap-[7px] rounded-2xl bg-text px-4 py-3">
+            <div className="mb-3 flex flex-col gap-0 rounded-2xl bg-text px-4 py-1.5">
               {phaseList.map((p) => {
                 const active = phase === p;
                 const info = fieldMeta(p, state, unitSystem, carbsPerHour);
@@ -616,12 +616,12 @@ export default function RaceFuelCalculator() {
                   <button
                     key={p}
                     type="button"
-                    className="flex cursor-pointer items-baseline justify-between gap-3 border-0 bg-transparent p-0 text-left"
+                    className="flex cursor-pointer items-baseline justify-between gap-3 border-0 bg-transparent px-0 py-[7px] text-left"
                     onClick={() => setPhase(p)}
                   >
                     <span
                       className={cx(
-                        'font-sans text-[9.5px] font-extrabold uppercase tracking-[0.18em]',
+                        'font-sans text-[10.5px] font-extrabold uppercase tracking-[0.18em]',
                         active ? 'text-amber' : 'text-bg/50'
                       )}
                     >
@@ -893,7 +893,10 @@ export default function RaceFuelCalculator() {
                   ))}
                 </div>
 
-                <div className="mt-4 overflow-x-auto">
+                <p className="mb-0 mt-4 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-text-muted md:hidden">
+                  Swipe sideways for prices →
+                </p>
+                <div className="mt-1.5 overflow-x-auto md:mt-4">
                   <table className="w-full border-collapse font-sans text-[13px]">
                     <thead>
                       <tr className="border-b-2 border-border text-left">
@@ -937,7 +940,7 @@ export default function RaceFuelCalculator() {
                           <td className="py-2 whitespace-nowrap">
                             <button
                               type="button"
-                              className="rounded-md border border-border bg-white px-2 py-1 text-[11.5px] font-bold text-text-muted hover:border-accent-deep hover:text-text"
+                              className="rounded-md border border-border bg-white px-2.5 py-2 text-[11.5px] font-bold text-text-muted hover:border-accent-deep hover:text-text"
                               onClick={() => patchPrices({ gelPrice: p.typicalPrice, gelCarbs: p.carbsG, currency: p.currency })}
                               title="Use this product's price and carbs in the training-block savings comparison below"
                             >

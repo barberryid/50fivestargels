@@ -229,7 +229,7 @@ export default function RecoveryDrinkBuilder() {
               type="button"
               aria-label="Back"
               onClick={back}
-              className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 hover:border-accent active:border-accent active:bg-bg-soft"
+              className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-border bg-white p-0 text-[15px] text-accent-deep transition-colors duration-150 before:absolute before:-inset-[7px] before:content-[''] hover:border-accent active:border-accent active:bg-bg-soft"
             >
               ←
             </button>
@@ -302,7 +302,7 @@ export default function RecoveryDrinkBuilder() {
               </button>
             </div>
 
-            <div className="mb-3 flex flex-col gap-[7px] rounded-2xl bg-text px-4 py-3">
+            <div className="mb-3 flex flex-col gap-0 rounded-2xl bg-text px-4 py-1.5">
               {phaseList.map((p) => {
                 const active = phase === p;
                 const info = fieldMeta(p, inputs, unitSystem);
@@ -311,12 +311,12 @@ export default function RecoveryDrinkBuilder() {
                   <button
                     key={p}
                     type="button"
-                    className="flex cursor-pointer items-baseline justify-between gap-3 border-0 bg-transparent p-0 text-left"
+                    className="flex cursor-pointer items-baseline justify-between gap-3 border-0 bg-transparent px-0 py-[7px] text-left"
                     onClick={() => setPhase(p)}
                   >
                     <span
                       className={cx(
-                        'font-sans text-[9.5px] font-extrabold uppercase tracking-[0.18em]',
+                        'font-sans text-[10.5px] font-extrabold uppercase tracking-[0.18em]',
                         active ? 'text-amber' : 'text-bg/50'
                       )}
                     >

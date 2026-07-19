@@ -56,7 +56,8 @@ const steps = [
         Prices indicative, verified July 2026 — check the retailer.
       </p>
 
-      <div class="fuel-card" style="margin-top:20px;padding:0;overflow-x:auto;">
+      <p class="table-swipe-hint" aria-hidden="true">Swipe sideways for the full table →</p>
+      <div class="fuel-card table-scroll-card" style="margin-top:20px;padding:0;overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
           <thead>
             <tr style="border-bottom:1.5px solid var(--color-border);">
@@ -160,3 +161,26 @@ const steps = [
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .table-swipe-hint {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .table-swipe-hint {
+      display: block;
+      margin: 20px 0 0;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+    }
+
+    .table-scroll-card {
+      margin-top: 6px !important;
+    }
+  }
+</style>

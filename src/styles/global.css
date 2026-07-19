@@ -153,6 +153,13 @@ summary:focus-visible {
   animation: shadow-idle 1.7s ease-in-out infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .gel-bounce-target,
+  .gel-shadow {
+    animation: none;
+  }
+}
+
 @media (max-width: 760px) {
   h1,
   h2,

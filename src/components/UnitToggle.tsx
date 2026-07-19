@@ -56,7 +56,7 @@ export default function UnitToggle({ value, onChange }: Props) {
           role="radio"
           aria-checked={value === opt.key}
           onClick={() => onChange(opt.key)}
-          className={`rounded-full border px-3.5 py-2 font-sans text-[13px] font-bold transition-colors ${
+          className={`rounded-full border px-3.5 py-2.5 font-sans text-[13px] font-bold transition-colors ${
             value === opt.key
               ? 'border-accent bg-accent text-bg'
               : 'border-border bg-white text-text-muted hover:border-accent-deep hover:text-text'
