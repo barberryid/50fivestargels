@@ -1,6 +1,6 @@
 # Kickoff prompt for Claude Code (Sonnet 5)
 
-Paste the following into Claude Code from the repo root (`C:\Users\Gary\code\50fivestargels`), with this handoff folder unzipped somewhere accessible (e.g. `design_handoff_homepage_entry_gate/` inside the repo):
+Paste the following into Claude Code from the repo root (`C:\Users\Gary\OneDrive\All Steviafinca data\Gary\50fivestargels`), with this handoff folder unzipped somewhere accessible (e.g. `design_handoff_homepage_entry_gate/` inside the repo):
 
 ---
 

@@ -6,8 +6,8 @@ them in as each piece of account-level setup is completed.
 
 ## Active project folder
 
-- Windows: `C:\Users\Gary\code\50fivestargels`
-- Git Bash: `/c/Users/Gary/code/50fivestargels`
+- Windows: `C:\Users\Gary\OneDrive\All Steviafinca data\Gary\50fivestargels`
+- Git Bash: `/c/Users/Gary/OneDrive/All Steviafinca data/Gary/50fivestargels`
 
 ## Software stack
 
@@ -29,7 +29,7 @@ them in as each piece of account-level setup is completed.
 
 ## Build & dev commands (Git Bash)
 
-    cd /c/Users/Gary/code/50fivestargels
+    cd "/c/Users/Gary/OneDrive/All Steviafinca data/Gary/50fivestargels"
     npm run dev        # local dev server on http://localhost:4321/
     npm run build      # production build into dist/
     npm run preview    # serve the production build locally

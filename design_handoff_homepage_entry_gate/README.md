@@ -9,7 +9,7 @@ Two visual directions were designed; **V3 is the one to implement**:
 - `50FiveStarGels Home.dc.html` — first draft. Ignore.
 
 ## About the Design Files
-The `.dc.html` files in this bundle are **design references created in HTML** — prototypes showing intended look and behavior, not production code to copy directly. The task is to **recreate this design in the target codebase**: the Astro 7 + Tailwind CSS v4 + React 19 project at `C:\Users\Gary\code\50fivestargels` (GitHub: `barberryid/50fivestargels`, deploys to https://50fivestargels.pages.dev). Follow that repo's conventions: static Astro pages, React islands only where interactivity demands it, theme tokens in `src/styles/global.css` under `@theme`, layouts in `src/layouts/BaseLayout.astro`, chrome in `src/components/Header.astro` / `Footer.astro`.
+The `.dc.html` files in this bundle are **design references created in HTML** — prototypes showing intended look and behavior, not production code to copy directly. The task is to **recreate this design in the target codebase**: the Astro 7 + Tailwind CSS v4 + React 19 project at `C:\Users\Gary\OneDrive\All Steviafinca data\Gary\50fivestargels` (GitHub: `barberryid/50fivestargels`, deploys to https://50fivestargels.pages.dev). Follow that repo's conventions: static Astro pages, React islands only where interactivity demands it, theme tokens in `src/styles/global.css` under `@theme`, layouts in `src/layouts/BaseLayout.astro`, chrome in `src/components/Header.astro` / `Footer.astro`.
 
 Suggested implementation shape:
 - Entry gate: a small React island (`client:load`) or plain vanilla `<script>` in `index.astro` — it's one counter + CSS animations; a full island is optional.
